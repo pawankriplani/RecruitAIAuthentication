@@ -80,7 +80,7 @@ CREATE TABLE LOGIN_HISTORY (
 
 -- Insert RMG test user (password: test123)
 INSERT INTO USERS (username, email, first_name, last_name, password_hash, account_status, is_active)
-VALUES ('rmg_test', 'rmg_test@example.com', 'RMG', 'Admin', 'test123', 'ACTIVE', TRUE);
+VALUES ('rmg_test', 'rmg_test@example.com', 'RMG', 'Admin', '$2a$10$QYGLYLCVwFbAO0ZV7f5e5erEWmGpjPL.qMNC5hBhIqhfhO9UW9/jW', 'ACTIVE', TRUE);
 
 -- Link RMG test user to RMG role
 INSERT INTO USER_ROLES (user_id, role_id)
