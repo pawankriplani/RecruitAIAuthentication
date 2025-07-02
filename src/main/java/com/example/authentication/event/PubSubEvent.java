@@ -3,16 +3,22 @@ package com.example.authentication.event;
 import com.example.authentication.util.Constants;
 
 public class PubSubEvent<T> {
-    private String eventType = Constants.EVENT_USER_REGISTERED;
+    private String eventType;
     private String timestamp;
     private T data;
 
     public PubSubEvent() {
+        this.eventType = Constants.EVENT_USER_REGISTERED; // Default to user registration event
     }
 
     public PubSubEvent(String timestamp, T data) {
+        this.eventType = Constants.EVENT_USER_REGISTERED; // Default to user registration event
         this.timestamp = timestamp;
         this.data = data;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
     public String getEventType() {

@@ -6,40 +6,84 @@
 	},
 	"item": [
 		{
-			"name": "Login as RMG",
-			"event": [
-				{
-					"listen": "test",
-					"script": {
-						"exec": [
-							"var jsonData = pm.response.json();",
-							"pm.environment.set(\"token\", jsonData.data.token);"
-						],
-						"type": "text/javascript"
-					}
-				}
-			],
+			"name": "Register User",
 			"request": {
 				"method": "POST",
-				"header": [],
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
 				"body": {
 					"mode": "raw",
-					"raw": "{\n    \"email\": \"{{rmg_username}}\",\n    \"password\": \"{{rmg_password}}\"\n}",
-					"options": {
-						"raw": {
-							"language": "json"
-						}
-					}
+					"raw": "{\n    \"username\": \"testmanager\",\n    \"email\": \"testmanager@example.com\",\n    \"password\": \"testpassword\",\n    \"roleName\": \"Manager\",\n    \"firstName\": \"Test\",\n    \"lastName\": \"Manager\",\n    \"permissionNames\": [\"mng_dashbaord\", \"mng_notif\", \"mng_pref\", \"mng_app_status\", \"mng_jb\"]\n}"
 				},
 				"url": {
-					"raw": "{{base_url}}/api/auth/login",
+					"raw": "{{baseUrl}}/api/auth/register",
 					"host": [
-						"{{base_url}}"
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpassword\"\n}"
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/login",
+					"host": [
+						"{{baseUrl}}"
 					],
 					"path": [
 						"api",
 						"auth",
 						"login"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Refresh Token",
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "\"{{refreshToken}}\""
+				},
+				"url": {
+					"raw": "{{baseUrl}}/api/auth/refresh",
+					"host": [
+						"{{baseUrl}}"
+					],
+					"path": [
+						"api",
+						"auth",
+						"refresh"
 					]
 				}
 			},
@@ -52,14 +96,13 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
+						"value": "Bearer {{accessToken}}"
 					}
 				],
 				"url": {
-					"raw": "{{base_url}}/api/users/pending-approvals",
+					"raw": "{{baseUrl}}/api/users/pending-approvals",
 					"host": [
-						"{{base_url}}"
+						"{{baseUrl}}"
 					],
 					"path": [
 						"api",
@@ -77,19 +120,18 @@
 				"header": [
 					{
 						"key": "Authorization",
-						"value": "Bearer {{token}}",
-						"type": "text"
+						"value": "Bearer {{accessToken}}"
 					}
 				],
 				"url": {
-					"raw": "{{base_url}}/api/users/{{user_id}}/approve",
+					"raw": "{{baseUrl}}/api/users/{{userId}}/approve",
 					"host": [
-						"{{base_url}}"
+						"{{baseUrl}}"
 					],
 					"path": [
 						"api",
 						"users",
-						"{{user_id}}",
+						"{{userId}}",
 						"approve"
 					]
 				}

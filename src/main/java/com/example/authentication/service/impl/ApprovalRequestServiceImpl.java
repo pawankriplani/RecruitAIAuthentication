@@ -2,6 +2,7 @@ package com.example.authentication.service.impl;
 
 import java.util.List;
 import com.example.authentication.event.UserRegistrationData;
+import com.example.authentication.event.AccountApprovalData;
 import com.example.authentication.exception.UserAlreadyApprovedException;
 import com.example.authentication.model.AccountApprovalRequest;
 import com.example.authentication.model.Role;
@@ -84,6 +85,22 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
 
         approvalRequest.setStatus(AccountApprovalRequest.Status.APPROVED);
         accountApprovalRequestRepository.save(approvalRequest);
+        
+        // Publish AccountApprovalData
+        String rmgEmail = userRepository.findRmgEmail()
+            .orElse(""); // If no RMG user found, use empty string
+        AccountApprovalData approvalData = new AccountApprovalData(
+            user.getUserId().toString(),
+            user.getUsername(),
+            user.getEmail(),
+            rmgEmail
+        );
+        
+        pubSubService.publishAccountApprovedEvent(approvalData)
+            .exceptionally(throwable -> {
+                logger.warn("Failed to publish account approved event, but account approval completed successfully", throwable);
+                return null;
+            });
 
         logger.info("Manager account approved for user: {}", user.getUsername());
     }

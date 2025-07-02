@@ -10,6 +10,7 @@ public class Constants {
 
     // Event Types
     public static final String EVENT_USER_REGISTERED = "UserRegistered";
+    public static final String EVENT_ACCOUNT_APPROVED = "AccountApproved";
 
     // Error Messages
     public static final String ERROR_USERNAME_TAKEN = "Error: Username is already taken!";
@@ -21,6 +22,7 @@ public class Constants {
 
     // PubSub Topic Names
     public static final String TOPIC_USER_REGISTRATION = "UserRegisterEvent";
+    public static final String TOPIC_ACCOUNT_APPROVED = "AccountApprovedEvent";
 
     private Constants() {
         // Private constructor to prevent instantiation
