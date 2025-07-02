@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +29,9 @@ public class UserService {
     private final RoleManagementService roleManagementService;
     private final ApprovalRequestService approvalRequestService;
     private final PubSubService pubSubService;
+    
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -97,6 +101,9 @@ public class UserService {
 
         User user = userCreationService.createUser(request);
         Role role = roleManagementService.findRole(request.getRoleName());
+        
+        List<Permission> permissions = permissionRepository.findByPermissionNameIn(request.getPermissionNames());
+        user.setPermissions(new HashSet<>(permissions));
 
         User savedUser = userCreationService.saveUser(user);
         roleManagementService.assignRole(savedUser, role);

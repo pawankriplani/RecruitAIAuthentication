@@ -3,6 +3,7 @@ package com.example.authentication.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 public class RegistrationRequest {
     
@@ -26,6 +27,8 @@ public class RegistrationRequest {
 
     @NotBlank(message = "Last name is required")
     private String lastName;
+
+    private List<String> permissionNames;
 
     // Getters and Setters
     public String getUsername() {
@@ -74,5 +77,13 @@ public class RegistrationRequest {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+    }
+
+    public List<String> getPermissionNames() {
+        return permissionNames;
+    }
+
+    public void setPermissionNames(List<String> permissionNames) {
+        this.permissionNames = permissionNames;
     }
 }

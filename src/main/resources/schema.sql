@@ -86,3 +86,41 @@ VALUES ('rmg_test', 'rmg_test@example.com', 'RMG', 'Admin', 'test123', 'ACTIVE',
 INSERT INTO USER_ROLES (user_id, role_id)
 SELECT (SELECT user_id FROM USERS WHERE username = 'rmg_test'),
        (SELECT role_id FROM ROLES WHERE role_name = 'RMG');
+
+-- New tables and data
+
+CREATE TABLE PERMISSIONS (
+    permission_id INT PRIMARY KEY AUTO_INCREMENT,
+    permission_name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL,
+    updated_by INT NULL,
+    
+    FOREIGN KEY (created_by) REFERENCES USERS(user_id),
+    FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
+);
+
+CREATE TABLE USER_PERMISSIONS (
+    user_id INT NOT NULL,
+    permission_id INT NOT NULL,
+    assigned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL,
+    updated_by INT NULL,
+
+    PRIMARY KEY (user_id, permission_id),
+
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id),
+    FOREIGN KEY (permission_id) REFERENCES PERMISSIONS(permission_id),
+    FOREIGN KEY (created_by) REFERENCES USERS(user_id),
+    FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
+);
+
+INSERT INTO PERMISSIONS (permission_name, description, created_by, updated_by)
+VALUES 
+  ('D1', 'Permission D1', NULL, NULL),
+  ('D2', 'Permission D2', NULL, NULL),
+  ('D3', 'Permission D3', NULL, NULL);

@@ -3,6 +3,7 @@ package com.example.authentication.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "USERS")
@@ -57,6 +58,14 @@ public class User {
 
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<UserRole> userRoles;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "USER_PERMISSIONS",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions = new HashSet<>();
 
     // Getters and Setters
     public Integer getUserId() {
@@ -169,6 +178,14 @@ public class User {
 
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     @PrePersist
