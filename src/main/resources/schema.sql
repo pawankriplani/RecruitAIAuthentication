@@ -124,3 +124,8 @@ VALUES
   ('D1', 'Permission D1', NULL, NULL),
   ('D2', 'Permission D2', NULL, NULL),
   ('D3', 'Permission D3', NULL, NULL);
+
+  INSERT INTO USER_PERMISSIONS (user_id, permission_id) VALUES
+  (1,1),
+  (1,2),
+  (1,3);

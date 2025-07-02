@@ -1,6 +1,7 @@
 package com.example.authentication.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UserDto {
     private Integer id;
@@ -11,6 +12,7 @@ public class UserDto {
     private String department;
     private LocalDateTime createdAt;
     private String role;
+    private List<String> permissionNames;
 
     public UserDto() {
     }
@@ -24,6 +26,7 @@ public class UserDto {
         this.department = department;
         this.createdAt = createdAt;
         this.role = role;
+        this.permissionNames = null;
     }
 
     public UserDto(String id, String username, String email, String role) {
@@ -96,5 +99,13 @@ public class UserDto {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<String> getPermissionNames() {
+        return permissionNames;
+    }
+
+    public void setPermissionNames(List<String> permissionNames) {
+        this.permissionNames = permissionNames;
     }
 }
