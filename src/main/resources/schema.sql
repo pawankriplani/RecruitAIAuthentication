@@ -120,12 +120,23 @@ CREATE TABLE USER_PERMISSIONS (
 );
 
 INSERT INTO PERMISSIONS (permission_name, description, created_by, updated_by)
-VALUES 
-  ('D1', 'Permission D1', NULL, NULL),
-  ('D2', 'Permission D2', NULL, NULL),
-  ('D3', 'Permission D3', NULL, NULL);
+VALUES
+('rmg_dashboard', 'Access to RMG Dashboard', 1, 1),
+('rmg_approval', 'Access to RMG Approvals', 1, 1),
+('rmg_user_mng', 'Manage RMG Users', 1, 1),
+('rmg_notif', 'RMG Notifications', 1, 1),
+('rmg_interview_mng', 'Manage RMG Interviews', 1, 1),
+('rmg_pref', 'RMG Preferences', 1, 1),
+('rmg_candidate_pool', 'RMG Candidate Pool Access', 1, 1),
+('rmg_track_status', 'Track RMG Status', 1, 1),
 
-  INSERT INTO USER_PERMISSIONS (user_id, permission_id) VALUES
-  (1,1),
-  (1,2),
-  (1,3);
+('mng_dashbaord', 'Access to Manager Dashboard', 1, 1),
+('mng_notif', 'Manager Notifications', 1, 1),
+('mng_pref', 'Manager Preferences', 1, 1),
+('mng_app_status', 'Manager Application Status', 1, 1),
+('mng_jb', 'Manage Job Board', 1, 1);
+
+INSERT INTO USER_PERMISSIONS (user_id, permission_id, created_by, updated_by)
+SELECT 1 AS user_id, permission_id, 1 AS created_by, 1 AS updated_by
+FROM PERMISSIONS
+WHERE permission_name LIKE 'rmg%';
