@@ -93,7 +93,9 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
             user.getUserId().toString(),
             user.getUsername(),
             user.getEmail(),
-            rmgEmail
+            rmgEmail,
+            null,
+            false
         );
         
         pubSubService.publishAccountApprovedEvent(approvalData)

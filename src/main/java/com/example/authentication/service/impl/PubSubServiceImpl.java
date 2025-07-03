@@ -74,6 +74,7 @@ public class PubSubServiceImpl implements PubSubService {
                 pubSubTemplate.publish(userRegistrationTopic, message);
                 logger.info("Successfully published user registration event for user: {} with RMG email: {}", 
                     data.getUsername(), data.getRmgEmail());
+                System.out.println("Successfully published user registration event for user"+message);
             } catch (Exception e) {
                 logger.error("Failed to publish user registration event for user: {}. Error: {}", 
                     data.getUsername(), e.getMessage());
@@ -94,11 +95,14 @@ public class PubSubServiceImpl implements PubSubService {
                 logger.info("Attempting to publish account approved event for user: {} to topic: {}", 
                     data.getUsername(), accountApprovedTopic);
 
-                PubSubEvent<AccountApprovalData> event = new PubSubEvent<>();
-                event.setTimestamp(Instant.now().toString());
-                event.setData(data);
-                // Set the event type
-                event.setEventType(Constants.EVENT_ACCOUNT_APPROVED);
+                // Set approval status in the data object
+                data.setApproval(true);
+
+                PubSubEvent<AccountApprovalData> event = new PubSubEvent<>(
+                    Constants.EVENT_ACCOUNT_APPROVED,
+                    Instant.now().toString(),
+                    data
+                );
 
                 String message = objectMapper.writeValueAsString(event);
                 logger.info("Publishing message: {}", message);

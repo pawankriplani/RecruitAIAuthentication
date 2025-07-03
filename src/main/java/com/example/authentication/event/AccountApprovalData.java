@@ -5,12 +5,20 @@ public class AccountApprovalData {
     private String username;
     private String email;
     private String approvedBy;
+    private String messages;
+    private Boolean approval;
 
-    public AccountApprovalData(String userId, String username, String email, String approvedBy) {
+    public AccountApprovalData(String userId, String username, String email, String approvedBy, String messages, Boolean approval) {
         this.userId = userId;
         this.username = username;
         this.email = email;
         this.approvedBy = approvedBy;
+        this.messages = messages;
+        this.approval = approval;
+    }
+
+    // Default constructor
+    public AccountApprovalData() {
     }
 
     // Getters and setters
@@ -44,5 +52,21 @@ public class AccountApprovalData {
 
     public void setApprovedBy(String approvedBy) {
         this.approvedBy = approvedBy;
+    }
+
+    public String getMessages() {
+        return messages;
+    }
+
+    public void setMessages(String messages) {
+        this.messages = messages;
+    }
+
+    public Boolean getApproval() {
+        return approval;
+    }
+
+    public void setApproval(Boolean approval) {
+        this.approval = approval;
     }
 }

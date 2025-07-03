@@ -8,21 +8,20 @@ public class PubSubEvent<T> {
     private T data;
 
     public PubSubEvent() {
-        this.eventType = Constants.EVENT_USER_REGISTERED; // Default to user registration event
     }
 
-    public PubSubEvent(String timestamp, T data) {
-        this.eventType = Constants.EVENT_USER_REGISTERED; // Default to user registration event
+    public PubSubEvent(String eventType, String timestamp, T data) {
+        this.eventType = eventType;
         this.timestamp = timestamp;
         this.data = data;
     }
 
-    public void setEventType(String eventType) {
-        this.eventType = eventType;
-    }
-
     public String getEventType() {
         return eventType;
+    }
+
+    public void setEventType(String eventType) {
+        this.eventType = eventType;
     }
 
     public String getTimestamp() {
