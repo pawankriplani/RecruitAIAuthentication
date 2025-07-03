@@ -66,6 +66,51 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
 
     @Override
     @Transactional
+    public void rejectManagerAccount(Integer userId, String reason) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getAccountStatus() != User.AccountStatus.PENDING) {
+            throw new IllegalStateException("User account is not in pending state");
+        }
+
+        // Update user status
+        user.setAccountStatus(User.AccountStatus.REJECTED);
+        userRepository.save(user);
+
+        // Update approval request
+        List<AccountApprovalRequest> approvalRequests = accountApprovalRequestRepository.findByUser(user);
+        if (approvalRequests.isEmpty()) {
+            throw new RuntimeException("Approval request not found");
+        }
+        AccountApprovalRequest approvalRequest = approvalRequests.get(0);
+        approvalRequest.setStatus(AccountApprovalRequest.Status.REJECTED);
+        approvalRequest.setRejectionReason(reason);
+        accountApprovalRequestRepository.save(approvalRequest);
+
+        // Publish rejection event
+        String rmgEmail = userRepository.findRmgEmail()
+            .orElse(""); // If no RMG user found, use empty string
+        AccountApprovalData approvalData = new AccountApprovalData(
+            user.getUserId().toString(),
+            user.getUsername(),
+            user.getEmail(),
+            rmgEmail,
+            reason,  // Set rejection reason in messages
+            false    // Set approval to false for rejection
+        );
+
+        pubSubService.publishAccountApprovedEvent(approvalData)
+            .exceptionally(throwable -> {
+                logger.warn("Failed to publish account rejection event, but account rejection completed successfully", throwable);
+                return null;
+            });
+
+        logger.info("Manager account rejected for user: {} with reason: {}", user.getUsername(), reason);
+    }
+
+    @Override
+    @Transactional
     public void approveManagerAccount(Integer userId) {
         User user = userRepository.findById(userId)
             .orElseThrow(() -> new RuntimeException("User not found"));
@@ -95,7 +140,7 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
             user.getEmail(),
             rmgEmail,
             null,
-            false
+            true  // Set to true for approval
         );
         
         pubSubService.publishAccountApprovedEvent(approvalData)

@@ -8,4 +8,5 @@ public interface ApprovalRequestService {
     AccountApprovalRequest createApprovalRequest(User user);
     void notifyApprovalRequest(User user, Role role);
     void approveManagerAccount(Integer userId);
+    void rejectManagerAccount(Integer userId, String reason);
 }

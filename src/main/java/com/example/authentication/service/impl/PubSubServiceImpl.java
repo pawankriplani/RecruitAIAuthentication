@@ -65,6 +65,7 @@ public class PubSubServiceImpl implements PubSubService {
             try {
                 logger.info("Attempting to publish event for user: {} to topic: {}", data.getUsername(), userRegistrationTopic);
                 PubSubEvent<UserRegistrationData> event = new PubSubEvent<>();
+                event.setEventType(Constants.EVENT_USER_REGISTERED);
                 event.setTimestamp(Instant.now().toString());
                 event.setData(data);
 

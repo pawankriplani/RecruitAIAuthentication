@@ -6,7 +6,7 @@ public class Constants {
     public static final String ROLE_RMG = "RMG";
 
     // Account Status
-    public static final String STATUS_PENDING = "pending";
+    public static final String STATUS_PENDING = "PENDING";
 
     // Event Types
     public static final String EVENT_USER_REGISTERED = "UserRegistered";

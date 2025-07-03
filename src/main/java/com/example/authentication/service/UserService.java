@@ -112,9 +112,9 @@ public class UserService {
 
         if (requiresApproval) {
             approvalRequestService.createApprovalRequest(savedUser);
-            approvalRequestService.notifyApprovalRequest(savedUser, role);
+           approvalRequestService.notifyApprovalRequest(savedUser, role);
         }
-
+        /*
         // Get RMG email
         String rmgEmail = userRepository.findRmgEmail()
             .orElseThrow(() -> new IllegalStateException("No active RMG user found in the system"));
@@ -128,7 +128,9 @@ public class UserService {
             savedUser.getAccountStatus().toString(),
             rmgEmail
         );
+        
         pubSubService.publishUserRegistrationEvent(registrationData);
+        */
 
         return new RegistrationResponse(Constants.SUCCESS_USER_REGISTERED, savedUser.getUserId(), requiresApproval);
     }
