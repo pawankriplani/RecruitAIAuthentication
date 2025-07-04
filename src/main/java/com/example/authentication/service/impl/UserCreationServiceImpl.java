@@ -26,8 +26,16 @@ public class UserCreationServiceImpl implements UserCreationService {
         user.setUsername(request.getUsername());
         user.setEmail(request.getEmail());
         user.setPasswordHash(passwordEncoder.encode(request.getPassword()));
-        user.setFirstName(request.getFirstName());
-        user.setLastName(request.getLastName());
+        user.setFullName(request.getFullName());
+        user.setEmployeeId(request.getEmployeeId());
+        user.setPhoneNumber(request.getPhoneNumber());
+        user.setDesignation(request.getDesignation());
+        user.setRegion(request.getRegion());
+        user.setCostCenter(request.getCostCenter());
+        user.setBusinessUnit(request.getBusinessUnit());
+        user.setReportingManagerEmail(request.getReportingManagerEmail());
+        user.setDepartment(request.getDepartment());
+        user.setProfilePicture(request.getProfilePicture());
         user.setAccountStatus(User.AccountStatus.PENDING);
         user.setIsActive(true);
         return user;

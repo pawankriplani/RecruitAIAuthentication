@@ -120,18 +120,14 @@ private UserDto createUserDto(User user) {
                 System.out.println("Debug - Mapping role: " + roleName);
                 return roleName;
             })
-            .findFirst().get();
+            .findFirst().orElse("User");
         
         System.out.println("Debug - Final selected role: " + role);
         
-//        List<String> permissionNames = user.getUserRoles().stream()
-//            .flatMap(userRole -> userRole.getRole().getPermissions().stream())
-//            .map(permission -> permission.getPermissionName())
-//            .distinct()
-//            .collect(Collectors.toList());
-        List<String> permissionNames =user.getPermissions().stream().map(permission -> permission.getPermissionName())
-        .distinct()
-        .collect(Collectors.toList());
+        List<String> permissionNames = user.getPermissions().stream()
+            .map(permission -> permission.getPermissionName())
+            .distinct()
+            .collect(Collectors.toList());
         
         System.out.println("Debug - Collected permission names: " + permissionNames);
             
@@ -139,9 +135,11 @@ private UserDto createUserDto(User user) {
             user.getUserId(),
             user.getUsername(),
             user.getEmail(),
-            user.getFirstName(),
-            user.getLastName(),
+            user.getFullName(),
+            user.getEmployeeId(),
             user.getDepartment(),
+            user.getDesignation(),
+            user.getRegion(),
             user.getCreatedAt(),
             role
         );

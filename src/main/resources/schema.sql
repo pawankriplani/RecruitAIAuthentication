@@ -1,14 +1,21 @@
 CREATE TABLE USERS (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
+    full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    department VARCHAR(100),
     password_hash VARCHAR(255) NOT NULL,
+    employee_id VARCHAR(50) NOT NULL UNIQUE,
+    phone_number VARCHAR(20),
+    designation VARCHAR(100),
+    region VARCHAR(100),
+    cost_center VARCHAR(100),
+    business_unit VARCHAR(100),
+    reporting_manager_email VARCHAR(100),
+    department VARCHAR(100),
     last_login DATETIME NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     account_status ENUM('PENDING', 'ACTIVE', 'INACTIVE', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+    profile_picture VARCHAR(255),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by INT NULL,
@@ -79,8 +86,8 @@ CREATE TABLE LOGIN_HISTORY (
 );
 
 -- Insert RMG test user (password: test123)
-INSERT INTO USERS (username, email, first_name, last_name, password_hash, account_status, is_active)
-VALUES ('rmg_test', 'rmg_test@example.com', 'RMG', 'Admin', '$2a$10$QYGLYLCVwFbAO0ZV7f5e5erEWmGpjPL.qMNC5hBhIqhfhO9UW9/jW', 'ACTIVE', TRUE);
+INSERT INTO USERS (username, full_name, email, password_hash, employee_id, designation, department, account_status, is_active)
+VALUES ('rmg_test', 'RMG Admin', 'rmg_test@example.com', '$2a$10$QYGLYLCVwFbAO0ZV7f5e5erEWmGpjPL.qMNC5hBhIqhfhO9UW9/jW', 'RMG001', 'RMG Administrator', 'Resource Management', 'ACTIVE', TRUE);
 
 -- Link RMG test user to RMG role
 INSERT INTO USER_ROLES (user_id, role_id)

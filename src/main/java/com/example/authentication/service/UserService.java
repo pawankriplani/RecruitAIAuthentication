@@ -65,9 +65,11 @@ public class UserService {
                             user.getUserId(),
                             user.getUsername(),
                             user.getEmail(),
-                            user.getFirstName(),
-                            user.getLastName(),
+                            user.getFullName(),
+                            user.getEmployeeId(),
                             user.getDepartment(),
+                            user.getDesignation(),
+                            user.getRegion(),
                             user.getCreatedAt(),
                             role
                         );
@@ -112,9 +114,13 @@ public class UserService {
 
         if (requiresApproval) {
             approvalRequestService.createApprovalRequest(savedUser);
-           approvalRequestService.notifyApprovalRequest(savedUser, role);
+  //          approvalRequestService.notifyApprovalRequest(savedUser, role);
         }
-        /*
+
+        // Log the registration of the new user
+        logger.info("New user registered: id={}, username={}, email={}, fullName={}, employeeId={}, role={}",
+            savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(), 
+            savedUser.getFullName(), savedUser.getEmployeeId(), role.getRoleName());
         // Get RMG email
         String rmgEmail = userRepository.findRmgEmail()
             .orElseThrow(() -> new IllegalStateException("No active RMG user found in the system"));
@@ -124,13 +130,17 @@ public class UserService {
             savedUser.getUserId().toString(),
             savedUser.getUsername(),
             savedUser.getEmail(),
+            savedUser.getFullName(),
+            savedUser.getEmployeeId(),
+            savedUser.getDesignation(),
             role.getRoleName(),
             savedUser.getAccountStatus().toString(),
             rmgEmail
         );
         
         pubSubService.publishUserRegistrationEvent(registrationData);
-        */
+
+        logger.info("Published user registration event for user: {}", savedUser.getUsername());
 
         return new RegistrationResponse(Constants.SUCCESS_USER_REGISTERED, savedUser.getUserId(), requiresApproval);
     }

@@ -46,25 +46,6 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
     }
 
     @Override
-    public void notifyApprovalRequest(User user, Role role) {
-        String rmgEmail = userRepository.findRmgEmail()
-            .orElse(""); // If no RMG user found, use empty string
-        UserRegistrationData registrationData = new UserRegistrationData(
-            user.getUserId().toString(),
-            user.getUsername(),
-            user.getEmail(),
-            role.getRoleName(),
-            Constants.STATUS_PENDING,
-            rmgEmail
-        );
-        pubSubService.publishUserRegistrationEvent(registrationData)
-            .exceptionally(throwable -> {
-                logger.warn("Failed to publish registration event, but user registration completed successfully", throwable);
-                return null;
-            });
-    }
-
-    @Override
     @Transactional
     public void rejectManagerAccount(Integer userId, String reason) {
         User user = userRepository.findById(userId)
