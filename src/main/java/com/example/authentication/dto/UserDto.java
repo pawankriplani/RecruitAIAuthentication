@@ -1,29 +1,42 @@
 package com.example.authentication.dto;
 
 import java.time.LocalDateTime;
+import java.util.List;
 
 public class UserDto {
     private Integer id;
     private String username;
     private String email;
-    private String firstName;
-    private String lastName;
+    private String fullName;
+    private String employeeId;
+    private String phoneNumber;
+    private String designation;
+    private String region;
+    private String costCenter;
+    private String businessUnit;
+    private String reportingManagerEmail;
     private String department;
+    private String profilePicture;
     private LocalDateTime createdAt;
     private String role;
+    private List<String> permissionNames;
 
     public UserDto() {
     }
 
-    public UserDto(Integer id, String username, String email, String firstName, String lastName, String department, LocalDateTime createdAt, String role) {
+    public UserDto(Integer id, String username, String email, String fullName, String employeeId, String department, 
+                  String designation, String region, LocalDateTime createdAt, String role) {
         this.id = id;
         this.username = username;
         this.email = email;
-        this.firstName = firstName;
-        this.lastName = lastName;
+        this.fullName = fullName;
+        this.employeeId = employeeId;
         this.department = department;
+        this.designation = designation;
+        this.region = region;
         this.createdAt = createdAt;
         this.role = role;
+        this.permissionNames = null;
     }
 
     public UserDto(String id, String username, String email, String role) {
@@ -58,20 +71,76 @@ public class UserDto {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getEmployeeId() {
+        return employeeId;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(String costCenter) {
+        this.costCenter = costCenter;
+    }
+
+    public String getBusinessUnit() {
+        return businessUnit;
+    }
+
+    public void setBusinessUnit(String businessUnit) {
+        this.businessUnit = businessUnit;
+    }
+
+    public String getReportingManagerEmail() {
+        return reportingManagerEmail;
+    }
+
+    public void setReportingManagerEmail(String reportingManagerEmail) {
+        this.reportingManagerEmail = reportingManagerEmail;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public String getDepartment() {
@@ -96,5 +165,13 @@ public class UserDto {
 
     public void setRole(String role) {
         this.role = role;
+    }
+
+    public List<String> getPermissionNames() {
+        return permissionNames;
+    }
+
+    public void setPermissionNames(List<String> permissionNames) {
+        this.permissionNames = permissionNames;
     }
 }

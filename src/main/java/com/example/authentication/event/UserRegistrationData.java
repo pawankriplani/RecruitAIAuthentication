@@ -4,14 +4,20 @@ public class UserRegistrationData {
     private String userId;
     private String username;
     private String email;
+    private String fullName;
+    private String employeeId;
+    private String designation;
     private String role;
     private String status;
     private String rmgEmail;
 
-    public UserRegistrationData(String userId, String username, String email, String role, String status, String rmgEmail) {
+    public UserRegistrationData(String userId, String username, String email, String fullName, String employeeId, String designation, String role, String status, String rmgEmail) {
         this.userId = userId;
         this.username = username;
         this.email = email;
+        this.fullName = fullName;
+        this.employeeId = employeeId;
+        this.designation = designation;
         this.role = role;
         this.status = status;
         this.rmgEmail = rmgEmail;
@@ -39,6 +45,30 @@ public class UserRegistrationData {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
+
+    public String getEmployeeId() {
+        return employeeId;
+    }
+
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
     }
 
     public String getRole() {

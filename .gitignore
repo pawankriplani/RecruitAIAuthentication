@@ -1,2 +1,8 @@
-target/classes/telus-koodo-key.json
-target/classes/telus-koodo-key.json
+# Ignore all JSON files in src/main/resources
+src/main/resources/*.json
+
+# Ignore all files and folders inside the target directory
+/target/
+
+# Ignore all log files and compressed log files
+Authentication/Authentication/logs/

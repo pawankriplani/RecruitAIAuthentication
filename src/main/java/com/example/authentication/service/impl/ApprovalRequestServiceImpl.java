@@ -2,6 +2,7 @@ package com.example.authentication.service.impl;
 
 import java.util.List;
 import com.example.authentication.event.UserRegistrationData;
+import com.example.authentication.event.AccountApprovalData;
 import com.example.authentication.exception.UserAlreadyApprovedException;
 import com.example.authentication.model.AccountApprovalRequest;
 import com.example.authentication.model.Role;
@@ -45,22 +46,48 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
     }
 
     @Override
-    public void notifyApprovalRequest(User user, Role role) {
+    @Transactional
+    public void rejectManagerAccount(Integer userId, String reason) {
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found"));
+
+        if (user.getAccountStatus() != User.AccountStatus.PENDING) {
+            throw new IllegalStateException("User account is not in pending state");
+        }
+
+        // Update user status
+        user.setAccountStatus(User.AccountStatus.REJECTED);
+        userRepository.save(user);
+
+        // Update approval request
+        List<AccountApprovalRequest> approvalRequests = accountApprovalRequestRepository.findByUser(user);
+        if (approvalRequests.isEmpty()) {
+            throw new RuntimeException("Approval request not found");
+        }
+        AccountApprovalRequest approvalRequest = approvalRequests.get(0);
+        approvalRequest.setStatus(AccountApprovalRequest.Status.REJECTED);
+        approvalRequest.setRejectionReason(reason);
+        accountApprovalRequestRepository.save(approvalRequest);
+
+        // Publish rejection event
         String rmgEmail = userRepository.findRmgEmail()
             .orElse(""); // If no RMG user found, use empty string
-        UserRegistrationData registrationData = new UserRegistrationData(
+        AccountApprovalData approvalData = new AccountApprovalData(
             user.getUserId().toString(),
             user.getUsername(),
             user.getEmail(),
-            role.getRoleName(),
-            Constants.STATUS_PENDING,
-            rmgEmail
+            rmgEmail,
+            reason,  // Set rejection reason in messages
+            false    // Set approval to false for rejection
         );
-        pubSubService.publishUserRegistrationEvent(registrationData)
+
+        pubSubService.publishAccountApprovedEvent(approvalData)
             .exceptionally(throwable -> {
-                logger.warn("Failed to publish registration event, but user registration completed successfully", throwable);
+                logger.warn("Failed to publish account rejection event, but account rejection completed successfully", throwable);
                 return null;
             });
+
+        logger.info("Manager account rejected for user: {} with reason: {}", user.getUsername(), reason);
     }
 
     @Override
@@ -83,7 +110,25 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
         AccountApprovalRequest approvalRequest = approvalRequests.get(0);
 
         approvalRequest.setStatus(AccountApprovalRequest.Status.APPROVED);
-        accountApprovalRequestRepository.save(approvalRequest);
+        //accountApprovalRequestRepository.save(approvalRequest);
+        
+        // Publish AccountApprovalData
+        String rmgEmail = userRepository.findRmgEmail()
+            .orElse(""); // If no RMG user found, use empty string
+        AccountApprovalData approvalData = new AccountApprovalData(
+            user.getUserId().toString(),
+            user.getUsername(),
+            user.getEmail(),
+            rmgEmail,
+            null,
+            true  // Set to true for approval
+        );
+        
+        pubSubService.publishAccountApprovedEvent(approvalData)
+            .exceptionally(throwable -> {
+                logger.warn("Failed to publish account approved event, but account approval completed successfully", throwable);
+                return null;
+            });
 
         logger.info("Manager account approved for user: {}", user.getUsername());
     }

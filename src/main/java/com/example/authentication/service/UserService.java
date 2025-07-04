@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,6 +29,9 @@ public class UserService {
     private final RoleManagementService roleManagementService;
     private final ApprovalRequestService approvalRequestService;
     private final PubSubService pubSubService;
+    
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
@@ -61,9 +65,11 @@ public class UserService {
                             user.getUserId(),
                             user.getUsername(),
                             user.getEmail(),
-                            user.getFirstName(),
-                            user.getLastName(),
+                            user.getFullName(),
+                            user.getEmployeeId(),
                             user.getDepartment(),
+                            user.getDesignation(),
+                            user.getRegion(),
                             user.getCreatedAt(),
                             role
                         );
@@ -97,6 +103,9 @@ public class UserService {
 
         User user = userCreationService.createUser(request);
         Role role = roleManagementService.findRole(request.getRoleName());
+        
+        List<Permission> permissions = permissionRepository.findByPermissionNameIn(request.getPermissionNames());
+        user.setPermissions(new HashSet<>(permissions));
 
         User savedUser = userCreationService.saveUser(user);
         roleManagementService.assignRole(savedUser, role);
@@ -105,9 +114,13 @@ public class UserService {
 
         if (requiresApproval) {
             approvalRequestService.createApprovalRequest(savedUser);
-            approvalRequestService.notifyApprovalRequest(savedUser, role);
+  //          approvalRequestService.notifyApprovalRequest(savedUser, role);
         }
 
+        // Log the registration of the new user
+        logger.info("New user registered: id={}, username={}, email={}, fullName={}, employeeId={}, role={}",
+            savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(), 
+            savedUser.getFullName(), savedUser.getEmployeeId(), role.getRoleName());
         // Get RMG email
         String rmgEmail = userRepository.findRmgEmail()
             .orElseThrow(() -> new IllegalStateException("No active RMG user found in the system"));
@@ -117,11 +130,17 @@ public class UserService {
             savedUser.getUserId().toString(),
             savedUser.getUsername(),
             savedUser.getEmail(),
+            savedUser.getFullName(),
+            savedUser.getEmployeeId(),
+            savedUser.getDesignation(),
             role.getRoleName(),
             savedUser.getAccountStatus().toString(),
             rmgEmail
         );
+        
         pubSubService.publishUserRegistrationEvent(registrationData);
+
+        logger.info("Published user registration event for user: {}", savedUser.getUsername());
 
         return new RegistrationResponse(Constants.SUCCESS_USER_REGISTERED, savedUser.getUserId(), requiresApproval);
     }

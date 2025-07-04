@@ -47,6 +47,18 @@ public class ManagerApprovalController {
         }
     }
 
+    private static class RejectRequest {
+        private String reason;
+
+        public String getReason() {
+            return reason;
+        }
+
+        public void setReason(String reason) {
+            this.reason = reason;
+        }
+    }
+
     @GetMapping("/pending-approvals")
     public ResponseEntity<ApiResponse<List<UserDto>>> getPendingApprovals() {
         logger.info("Received request for pending approvals");
@@ -56,6 +68,34 @@ public class ManagerApprovalController {
     }
 
    
+    @PutMapping("/{userId}/reject")
+    public ResponseEntity<ApiResponse<ApprovalData>> rejectManagerAccount(
+            @PathVariable Integer userId,
+            @RequestBody RejectRequest rejectRequest) {
+        logger.info("Received request to reject manager account for user ID: {} with reason: {}", 
+            userId, rejectRequest.getReason());
+        try {
+            User user = userService.getUserById(userId);
+            ApprovalData data;
+            
+            if (user.getAccountStatus() == User.AccountStatus.PENDING) {
+                approvalRequestService.rejectManagerAccount(userId, rejectRequest.getReason());
+                data = new ApprovalData("Manager account rejected successfully", "REJECTED");
+            } else if (user.getAccountStatus() == User.AccountStatus.REJECTED) {
+                data = new ApprovalData("Manager account is already rejected", "REJECTED");
+            } else {
+                data = new ApprovalData("Unable to reject manager account", user.getAccountStatus().toString());
+            }
+            
+            logger.info("Rejection process completed for user ID: {}", userId);
+            return ResponseEntity.ok(ApiResponse.success(data, data.getMessage()));
+        } catch (RuntimeException e) {
+            logger.error("Failed to reject manager account for user ID: {}", userId, e);
+            ApprovalData data = new ApprovalData("Failed to reject manager account: " + e.getMessage(), "ERROR");
+            return ResponseEntity.badRequest().body(ApiResponse.error(data.getMessage(), 400));
+        }
+    }
+
     @PutMapping("/{userId}/approve")
     public ResponseEntity<ApiResponse<ApprovalData>> approveManagerAccount(@PathVariable Integer userId) {
         logger.info("Received request to approve manager account for user ID: {}", userId);

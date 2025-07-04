@@ -66,12 +66,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         user.setLastLogin(LocalDateTime.now());
         userRepository.save(user);
 
-        // Create UserDetails for token generation
-        UserDetails userDetails = createUserDetails(user);
-
         // Generate tokens
-        String token = jwtUtil.generateToken(userDetails);
-        String refreshToken = jwtUtil.generateRefreshToken(userDetails);
+        String token = jwtUtil.generateToken(user);
+        String refreshToken = jwtUtil.generateRefreshToken(user);
 
         // Create response
         return new LoginResponse(
@@ -83,15 +80,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 
     @Override
     public LoginResponse refreshToken(String refreshToken) {
-        String username = jwtUtil.extractUsername(refreshToken);
-        User user = userRepository.findByEmail(username)
+        String email = jwtUtil.extractEmail(refreshToken);
+        User user = userRepository.findByEmail(email)
                 .orElseThrow(() -> new BadCredentialsException("Invalid refresh token"));
 
-        UserDetails userDetails = createUserDetails(user);
-
-        if (jwtUtil.validateToken(refreshToken, userDetails)) {
-            String newToken = jwtUtil.generateToken(userDetails);
-            String newRefreshToken = jwtUtil.generateRefreshToken(userDetails);
+        if (jwtUtil.validateToken(refreshToken, user)) {
+            String newToken = jwtUtil.generateToken(user);
+            String newRefreshToken = jwtUtil.generateRefreshToken(user);
 
             return new LoginResponse(
                 newToken,
@@ -115,7 +110,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         );
     }
 
-    private UserDto createUserDto(User user) {
+private UserDto createUserDto(User user) {
         System.out.println("Debug - Creating UserDto for user: " + user.getUsername());
         System.out.println("Debug - User roles before mapping: " + user.getUserRoles());
         
@@ -125,20 +120,31 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 System.out.println("Debug - Mapping role: " + roleName);
                 return roleName;
             })
-            .findFirst().get();
+            .findFirst().orElse("User");
         
         System.out.println("Debug - Final selected role: " + role);
+        
+        List<String> permissionNames = user.getPermissions().stream()
+            .map(permission -> permission.getPermissionName())
+            .distinct()
+            .collect(Collectors.toList());
+        
+        System.out.println("Debug - Collected permission names: " + permissionNames);
             
         UserDto userDto = new UserDto(
             user.getUserId(),
             user.getUsername(),
             user.getEmail(),
-            user.getFirstName(),
-            user.getLastName(),
+            user.getFullName(),
+            user.getEmployeeId(),
             user.getDepartment(),
+            user.getDesignation(),
+            user.getRegion(),
             user.getCreatedAt(),
             role
         );
+        
+        userDto.setPermissionNames(permissionNames);
         
         System.out.println("Debug - Created UserDto: " + userDto);
         return userDto;

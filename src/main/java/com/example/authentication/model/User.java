@@ -3,6 +3,7 @@ package com.example.authentication.model;
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.HashSet;
 
 @Entity
 @Table(name = "USERS")
@@ -19,14 +20,35 @@ public class User {
     @Column(nullable = false, unique = true)
     private String email;
 
-    @Column(name = "first_name", nullable = false)
-    private String firstName;
+    @Column(name = "full_name", nullable = false)
+    private String fullName;
 
-    @Column(name = "last_name", nullable = false)
-    private String lastName;
+    @Column(name = "employee_id", nullable = false, unique = true)
+    private String employeeId;
+
+    @Column(name = "phone_number")
+    private String phoneNumber;
+
+    @Column(name = "designation")
+    private String designation;
+
+    @Column(name = "region")
+    private String region;
+
+    @Column(name = "cost_center")
+    private String costCenter;
+
+    @Column(name = "business_unit")
+    private String businessUnit;
+
+    @Column(name = "reporting_manager_email")
+    private String reportingManagerEmail;
 
     @Column(name = "department")
     private String department;
+
+    @Column(name = "profile_picture")
+    private String profilePicture;
 
     @Column(name = "password_hash", nullable = false)
     private String passwordHash;
@@ -58,6 +80,14 @@ public class User {
     @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
     private Set<UserRole> userRoles;
 
+    @ManyToMany(fetch = FetchType.LAZY)
+    @JoinTable(
+        name = "USER_PERMISSIONS",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "permission_id")
+    )
+    private Set<Permission> permissions = new HashSet<>();
+
     // Getters and Setters
     public Integer getUserId() {
         return userId;
@@ -83,20 +113,68 @@ public class User {
         this.email = email;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getEmployeeId() {
+        return employeeId;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(String costCenter) {
+        this.costCenter = costCenter;
+    }
+
+    public String getBusinessUnit() {
+        return businessUnit;
+    }
+
+    public void setBusinessUnit(String businessUnit) {
+        this.businessUnit = businessUnit;
+    }
+
+    public String getReportingManagerEmail() {
+        return reportingManagerEmail;
+    }
+
+    public void setReportingManagerEmail(String reportingManagerEmail) {
+        this.reportingManagerEmail = reportingManagerEmail;
     }
 
     public String getDepartment() {
@@ -105,6 +183,14 @@ public class User {
 
     public void setDepartment(String department) {
         this.department = department;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
     public String getPasswordHash() {
@@ -169,6 +255,14 @@ public class User {
 
     public void setUserRoles(Set<UserRole> userRoles) {
         this.userRoles = userRoles;
+    }
+
+    public Set<Permission> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(Set<Permission> permissions) {
+        this.permissions = permissions;
     }
 
     @PrePersist
