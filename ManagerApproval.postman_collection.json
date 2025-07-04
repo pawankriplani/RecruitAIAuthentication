@@ -1,142 +1,303 @@
 {
-	"info": {
-		"_postman_id": "unique-id-here",
-		"name": "Manager Approval",
-		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
-	},
-	"item": [
-		{
-			"name": "Register User",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"testmanager\",\n    \"email\": \"testmanager@example.com\",\n    \"password\": \"testpassword\",\n    \"roleName\": \"Manager\",\n    \"firstName\": \"Test\",\n    \"lastName\": \"Manager\",\n    \"permissionNames\": [\"mng_dashbaord\", \"mng_notif\", \"mng_pref\", \"mng_app_status\", \"mng_jb\"]\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/api/auth/register",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"auth",
-						"register"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Login",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "{\n    \"username\": \"testuser\",\n    \"password\": \"testpassword\"\n}"
-				},
-				"url": {
-					"raw": "{{baseUrl}}/api/auth/login",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"auth",
-						"login"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Refresh Token",
-			"request": {
-				"method": "POST",
-				"header": [
-					{
-						"key": "Content-Type",
-						"value": "application/json"
-					}
-				],
-				"body": {
-					"mode": "raw",
-					"raw": "\"{{refreshToken}}\""
-				},
-				"url": {
-					"raw": "{{baseUrl}}/api/auth/refresh",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"auth",
-						"refresh"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Get Pending Approvals",
-			"request": {
-				"method": "GET",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{accessToken}}"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/api/users/pending-approvals",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"users",
-						"pending-approvals"
-					]
-				}
-			},
-			"response": []
-		},
-		{
-			"name": "Approve Manager Account",
-			"request": {
-				"method": "PUT",
-				"header": [
-					{
-						"key": "Authorization",
-						"value": "Bearer {{accessToken}}"
-					}
-				],
-				"url": {
-					"raw": "{{baseUrl}}/api/users/{{userId}}/approve",
-					"host": [
-						"{{baseUrl}}"
-					],
-					"path": [
-						"api",
-						"users",
-						"{{userId}}",
-						"approve"
-					]
-				}
-			},
-			"response": []
-		}
-	]
+    "info": {
+        "_postman_id": "unique-id-here",
+        "name": "Manager Approval",
+        "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+    },
+    "item": [
+        {
+            "name": "Register User",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"username\": \"testmanager\",\n    \"email\": \"testmanager@example.com\",\n    \"password\": \"testpassword123\",\n    \"roleName\": \"Manager\",\n    \"fullName\": \"Test Manager\",\n    \"employeeId\": \"EMP123\",\n    \"phoneNumber\": \"+1234567890\",\n    \"designation\": \"Senior Manager\",\n    \"region\": \"North America\",\n    \"costCenter\": \"CC001\",\n    \"businessUnit\": \"Sales\",\n    \"reportingManagerEmail\": \"supervisor@example.com\",\n    \"department\": \"Sales Operations\",\n    \"profilePicture\": \"https://example.com/profile.jpg\",\n    \"permissionNames\": [\"mng_dashboard\", \"mng_notif\", \"mng_pref\", \"mng_app_status\", \"mng_jb\"]\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/register",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "auth",
+                        "register"
+                    ]
+                },
+                "description": "Register a new user with complete profile information"
+            },
+            "response": [
+                {
+                    "name": "Successful Registration",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"username\": \"testmanager\",\n    \"email\": \"testmanager@example.com\",\n    \"password\": \"testpassword123\",\n    \"roleName\": \"Manager\",\n    \"fullName\": \"Test Manager\",\n    \"employeeId\": \"EMP123\",\n    \"phoneNumber\": \"+1234567890\",\n    \"designation\": \"Senior Manager\",\n    \"region\": \"North America\",\n    \"costCenter\": \"CC001\",\n    \"businessUnit\": \"Sales\",\n    \"reportingManagerEmail\": \"supervisor@example.com\",\n    \"department\": \"Sales Operations\",\n    \"profilePicture\": \"https://example.com/profile.jpg\",\n    \"permissionNames\": [\"mng_dashboard\", \"mng_notif\", \"mng_pref\", \"mng_app_status\", \"mng_jb\"]\n}"
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n    \"status\": \"success\",\n    \"message\": \"User registered successfully\",\n    \"data\": {\n        \"message\": \"Registration successful\",\n        \"userId\": 123,\n        \"requiresApproval\": true\n    }\n}"
+                }
+            ]
+        },
+        {
+            "name": "Login",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"email\": \"testmanager@example.com\",\n    \"password\": \"testpassword123\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/login",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "auth",
+                        "login"
+                    ]
+                },
+                "description": "Login with email and password"
+            },
+            "response": [
+                {
+                    "name": "Successful Login",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"email\": \"testmanager@example.com\",\n    \"password\": \"testpassword123\"\n}"
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n    \"status\": \"success\",\n    \"message\": \"Login successful\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"user\": {\n            \"id\": 123,\n            \"username\": \"testmanager\",\n            \"email\": \"testmanager@example.com\",\n            \"fullName\": \"Test Manager\",\n            \"employeeId\": \"EMP123\",\n            \"phoneNumber\": \"+1234567890\",\n            \"designation\": \"Senior Manager\",\n            \"region\": \"North America\",\n            \"costCenter\": \"CC001\",\n            \"businessUnit\": \"Sales\",\n            \"reportingManagerEmail\": \"supervisor@example.com\",\n            \"department\": \"Sales Operations\",\n            \"profilePicture\": \"https://example.com/profile.jpg\",\n            \"createdAt\": \"2025-07-04T12:00:00\",\n            \"role\": \"Manager\",\n            \"permissionNames\": [\"mng_dashboard\", \"mng_notif\", \"mng_pref\", \"mng_app_status\", \"mng_jb\"]\n        }\n    }\n}"
+                }
+            ]
+        },
+        {
+            "name": "Refresh Token",
+            "request": {
+                "method": "POST",
+                "header": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\""
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/auth/refresh",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "auth",
+                        "refresh"
+                    ]
+                },
+                "description": "Refresh access token using refresh token"
+            },
+            "response": [
+                {
+                    "name": "Successful Token Refresh",
+                    "originalRequest": {
+                        "method": "POST",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "\"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\""
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n    \"status\": \"success\",\n    \"message\": \"Token refreshed successfully\",\n    \"data\": {\n        \"token\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"refreshToken\": \"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...\",\n        \"user\": {\n            \"id\": 123,\n            \"username\": \"testmanager\",\n            \"email\": \"testmanager@example.com\",\n            \"fullName\": \"Test Manager\",\n            \"role\": \"Manager\"\n        }\n    }\n}"
+                }
+            ]
+        },
+        {
+            "name": "Get Pending Approvals",
+            "request": {
+                "method": "GET",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/users/pending-approvals",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users",
+                        "pending-approvals"
+                    ]
+                },
+                "description": "Get list of users pending approval"
+            },
+            "response": [
+                {
+                    "name": "Successful Pending Approvals Retrieval",
+                    "originalRequest": {
+                        "method": "GET",
+                        "header": []
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n    \"status\": \"success\",\n    \"message\": \"Pending approvals retrieved successfully\",\n    \"data\": [\n        {\n            \"id\": 123,\n            \"username\": \"testmanager\",\n            \"email\": \"testmanager@example.com\",\n            \"fullName\": \"Test Manager\",\n            \"employeeId\": \"EMP123\",\n            \"phoneNumber\": \"+1234567890\",\n            \"designation\": \"Senior Manager\",\n            \"region\": \"North America\",\n            \"department\": \"Sales Operations\",\n            \"createdAt\": \"2025-07-04T12:00:00\",\n            \"role\": \"Manager\"\n        }\n    ]\n}"
+                }
+            ]
+        },
+        {
+            "name": "Approve Manager Account",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "url": {
+                    "raw": "{{baseUrl}}/api/users/{{userId}}/approve",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users",
+                        "{{userId}}",
+                        "approve"
+                    ]
+                },
+                "description": "Approve a pending manager account"
+            },
+            "response": [
+                {
+                    "name": "Successful Approval",
+                    "originalRequest": {
+                        "method": "PUT",
+                        "header": []
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n    \"status\": \"success\",\n    \"message\": \"Manager account approved successfully\",\n    \"data\": {\n        \"message\": \"Manager account approved successfully\",\n        \"status\": \"ACTIVE\"\n    }\n}"
+                }
+            ]
+        },
+        {
+            "name": "Reject Manager Account",
+            "request": {
+                "method": "PUT",
+                "header": [
+                    {
+                        "key": "Authorization",
+                        "value": "Bearer {{accessToken}}"
+                    },
+                    {
+                        "key": "Content-Type",
+                        "value": "application/json"
+                    }
+                ],
+                "body": {
+                    "mode": "raw",
+                    "raw": "{\n    \"reason\": \"Insufficient information provided\"\n}"
+                },
+                "url": {
+                    "raw": "{{baseUrl}}/api/users/{{userId}}/reject",
+                    "host": [
+                        "{{baseUrl}}"
+                    ],
+                    "path": [
+                        "api",
+                        "users",
+                        "{{userId}}",
+                        "reject"
+                    ]
+                },
+                "description": "Reject a pending manager account with a reason"
+            },
+            "response": [
+                {
+                    "name": "Successful Rejection",
+                    "originalRequest": {
+                        "method": "PUT",
+                        "header": [],
+                        "body": {
+                            "mode": "raw",
+                            "raw": "{\n    \"reason\": \"Insufficient information provided\"\n}"
+                        }
+                    },
+                    "status": "OK",
+                    "code": 200,
+                    "header": [
+                        {
+                            "key": "Content-Type",
+                            "value": "application/json"
+                        }
+                    ],
+                    "body": "{\n    \"status\": \"success\",\n    \"message\": \"Manager account rejected successfully\",\n    \"data\": {\n        \"message\": \"Manager account rejected successfully\",\n        \"status\": \"REJECTED\"\n    }\n}"
+                }
+            ]
+        }
+    ]
 }

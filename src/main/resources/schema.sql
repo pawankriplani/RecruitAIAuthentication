@@ -137,7 +137,7 @@ VALUES
 ('rmg_candidate_pool', 'RMG Candidate Pool Access', 1, 1),
 ('rmg_track_status', 'Track RMG Status', 1, 1),
 
-('mng_dashbaord', 'Access to Manager Dashboard', 1, 1),
+('mng_dashboard', 'Access to Manager Dashboard', 1, 1),
 ('mng_notif', 'Manager Notifications', 1, 1),
 ('mng_pref', 'Manager Preferences', 1, 1),
 ('mng_app_status', 'Manager Application Status', 1, 1),
