@@ -96,9 +96,6 @@ public class PubSubServiceImpl implements PubSubService {
                 logger.info("Attempting to publish account approved event for user: {} to topic: {}", 
                     data.getUsername(), accountApprovedTopic);
 
-                // Set approval status in the data object
-                data.setApproval(true);
-
                 PubSubEvent<AccountApprovalData> event = new PubSubEvent<>(
                     Constants.EVENT_ACCOUNT_APPROVED,
                     Instant.now().toString(),

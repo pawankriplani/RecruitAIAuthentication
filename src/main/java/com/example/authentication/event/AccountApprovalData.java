@@ -6,7 +6,7 @@ public class AccountApprovalData {
     private String email;
     private String approvedBy;
     private String messages;
-    private Boolean approval;
+    private Boolean approved;
 
     public AccountApprovalData(String userId, String username, String email, String approvedBy, String messages, Boolean approval) {
         this.userId = userId;
@@ -14,7 +14,7 @@ public class AccountApprovalData {
         this.email = email;
         this.approvedBy = approvedBy;
         this.messages = messages;
-        this.approval = approval;
+        this.approved = approval;
     }
 
     // Default constructor
@@ -62,11 +62,13 @@ public class AccountApprovalData {
         this.messages = messages;
     }
 
-    public Boolean getApproval() {
-        return approval;
-    }
+	public Boolean getApproved() {
+		return approved;
+	}
 
-    public void setApproval(Boolean approval) {
-        this.approval = approval;
-    }
+	public void setApproved(Boolean approved) {
+		this.approved = approved;
+	}
+
+   
 }

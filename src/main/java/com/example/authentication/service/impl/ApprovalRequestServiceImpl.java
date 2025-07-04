@@ -129,7 +129,7 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
         AccountApprovalRequest approvalRequest = approvalRequests.get(0);
 
         approvalRequest.setStatus(AccountApprovalRequest.Status.APPROVED);
-        accountApprovalRequestRepository.save(approvalRequest);
+        //accountApprovalRequestRepository.save(approvalRequest);
         
         // Publish AccountApprovalData
         String rmgEmail = userRepository.findRmgEmail()
