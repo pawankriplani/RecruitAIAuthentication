@@ -3,6 +3,7 @@ package com.example.authentication.service.impl;
 import com.example.authentication.dto.LoginRequest;
 import com.example.authentication.dto.LoginResponse;
 import com.example.authentication.dto.UserDto;
+import com.example.authentication.exception.EmailNotFoundException;
 import com.example.authentication.exception.InactiveAccountException;
 import com.example.authentication.exception.PendingAccountException;
 import com.example.authentication.exception.RejectedAccountException;
@@ -45,13 +46,13 @@ public class AuthenticationServiceImpl implements AuthenticationService {
 @Transactional
 public LoginResponse login(LoginRequest loginRequest) {
     User user = userRepository.findByEmailWithRoles(loginRequest.getEmail())
-            .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+            .orElseThrow(() -> new EmailNotFoundException("No account found with this email address"));
     
     checkAccountStatus(user);
 
     // Check password
     if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
-        throw new BadCredentialsException("Invalid email or password");
+        throw new BadCredentialsException("Invalid password");
     }
 
     // Update last login
