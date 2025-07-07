@@ -31,18 +31,18 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegistrationResponse>> registerUser(@Valid @RequestBody RegistrationRequest request) {
         RegistrationResponse response = userService.registerUser(request);
-        return ResponseEntity.ok(responseService.successResponse(response, "User registered successfully"));
+        return ResponseEntity.ok(responseService.successResponse(response));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = authenticationService.login(loginRequest);
-        return ResponseEntity.ok(responseService.successResponse(loginResponse, "Login successful"));
+        return ResponseEntity.ok(responseService.successResponse(loginResponse));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody String refreshToken) {
         LoginResponse loginResponse = authenticationService.refreshToken(refreshToken);
-        return ResponseEntity.ok(responseService.successResponse(loginResponse, "Token refreshed successfully"));
+        return ResponseEntity.ok(responseService.successResponse(loginResponse));
     }
 }

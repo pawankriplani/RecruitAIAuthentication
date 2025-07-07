@@ -5,6 +5,7 @@ import com.example.authentication.dto.RegistrationResponse;
 import com.example.authentication.dto.UserDto;
 import com.example.authentication.event.UserRegistrationData;
 import com.example.authentication.exception.EmailAlreadyInUseException;
+import com.example.authentication.exception.EmployeeIdAlreadyExistsException;
 import com.example.authentication.exception.ResourceNotFoundException;
 import com.example.authentication.exception.UsernameAlreadyTakenException;
 import com.example.authentication.model.*;
@@ -99,6 +100,10 @@ public class UserService {
 
         if (userRepository.existsByEmail(request.getEmail())) {
             throw new EmailAlreadyInUseException(Constants.ERROR_EMAIL_IN_USE);
+        }
+
+        if (userRepository.existsByEmployeeId(request.getEmployeeId())) {
+            throw new EmployeeIdAlreadyExistsException("Employee ID already exists");
         }
 
         User user = userCreationService.createUser(request);

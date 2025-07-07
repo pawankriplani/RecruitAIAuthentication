@@ -3,6 +3,9 @@ package com.example.authentication.service.impl;
 import com.example.authentication.dto.LoginRequest;
 import com.example.authentication.dto.LoginResponse;
 import com.example.authentication.dto.UserDto;
+import com.example.authentication.exception.InactiveAccountException;
+import com.example.authentication.exception.PendingAccountException;
+import com.example.authentication.exception.RejectedAccountException;
 import com.example.authentication.model.User;
 import com.example.authentication.model.UserRole;
 import com.example.authentication.model.AccountApprovalRequest;
@@ -38,45 +41,52 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         this.jwtUtil = jwtUtil;
     }
 
-    @Override
-    @Transactional
-    public LoginResponse login(LoginRequest loginRequest) {
-        User user = userRepository.findByEmailWithRoles(loginRequest.getEmail())
-                .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
-        
-        System.out.println("Debug - Found user: " + user.getUsername());
-        System.out.println("Debug - User roles size: " + (user.getUserRoles() != null ? user.getUserRoles().size() : "null"));
-        if (user.getUserRoles() != null) {
-            user.getUserRoles().forEach(userRole -> {
-                System.out.println("Debug - Role: " + userRole.getRole().getRoleName());
-            });
-        }
+@Override
+@Transactional
+public LoginResponse login(LoginRequest loginRequest) {
+    User user = userRepository.findByEmailWithRoles(loginRequest.getEmail())
+            .orElseThrow(() -> new BadCredentialsException("Invalid email or password"));
+    
+    checkAccountStatus(user);
 
-        // Check password
-        if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
-            throw new BadCredentialsException("Invalid email or password");
-        }
-
-        // Check if user is active and account status is ACTIVE
-        if (!user.getIsActive() || user.getAccountStatus() != User.AccountStatus.ACTIVE) {
-            throw new BadCredentialsException("Account is not active or pending approval");
-        }
-
-        // Update last login
-        user.setLastLogin(LocalDateTime.now());
-        userRepository.save(user);
-
-        // Generate tokens
-        String token = jwtUtil.generateToken(user);
-        String refreshToken = jwtUtil.generateRefreshToken(user);
-
-        // Create response
-        return new LoginResponse(
-            token,
-            refreshToken,
-            createUserDto(user)
-        );
+    // Check password
+    if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
+        throw new BadCredentialsException("Invalid email or password");
     }
+
+    // Update last login
+    user.setLastLogin(LocalDateTime.now());
+    userRepository.save(user);
+
+    // Generate tokens
+    String token = jwtUtil.generateToken(user);
+    String refreshToken = jwtUtil.generateRefreshToken(user);
+
+    // Create response
+    return new LoginResponse(
+        token,
+        refreshToken,
+        createUserDto(user)
+    );
+}
+
+private void checkAccountStatus(User user) {
+    if (!user.getIsActive()) {
+        throw new InactiveAccountException("Your account is currently inactive. Please contact the administrator.");
+    }
+    
+    switch (user.getAccountStatus()) {
+        case PENDING:
+            throw new PendingAccountException("Your account is pending approval. Please wait for admin confirmation.");
+        case INACTIVE:
+            throw new InactiveAccountException("Your account is currently inactive. Please contact the administrator.");
+        case REJECTED:
+            throw new RejectedAccountException("Your account registration has been rejected. Please contact the administrator for more information.");
+        case ACTIVE:
+            // Proceed with login
+            break;
+    }
+}
 
     @Override
     public LoginResponse refreshToken(String refreshToken) {

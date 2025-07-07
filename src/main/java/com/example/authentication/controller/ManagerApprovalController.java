@@ -64,7 +64,7 @@ public class ManagerApprovalController {
         logger.info("Received request for pending approvals");
         List<UserDto> pendingUsers = userService.getPendingUsers();
         logger.info("Retrieved {} pending users", pendingUsers.size());
-        return ResponseEntity.ok(ApiResponse.success(pendingUsers, "Pending approvals retrieved successfully"));
+        return ResponseEntity.ok(ApiResponse.success(pendingUsers));
     }
 
    
@@ -88,11 +88,10 @@ public class ManagerApprovalController {
             }
             
             logger.info("Rejection process completed for user ID: {}", userId);
-            return ResponseEntity.ok(ApiResponse.success(data, data.getMessage()));
+            return ResponseEntity.ok(ApiResponse.success(data));
         } catch (RuntimeException e) {
             logger.error("Failed to reject manager account for user ID: {}", userId, e);
-            ApprovalData data = new ApprovalData("Failed to reject manager account: " + e.getMessage(), "ERROR");
-            return ResponseEntity.badRequest().body(ApiResponse.error(data.getMessage(), 400));
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Failed to reject manager account: " + e.getMessage()));
         }
     }
 
@@ -113,11 +112,10 @@ public class ManagerApprovalController {
             }
             
             logger.info("Approval process completed for user ID: {}", userId);
-            return ResponseEntity.ok(ApiResponse.success(data, data.getMessage()));
+            return ResponseEntity.ok(ApiResponse.success(data));
         } catch (RuntimeException e) {
             logger.error("Failed to approve manager account for user ID: {}", userId, e);
-            ApprovalData data = new ApprovalData("Failed to approve manager account: " + e.getMessage(), "ERROR");
-            return ResponseEntity.badRequest().body(ApiResponse.error(data.getMessage(), 400));
+            return ResponseEntity.badRequest().body(ApiResponse.error(400, "Failed to approve manager account: " + e.getMessage()));
         }
     }
 }
