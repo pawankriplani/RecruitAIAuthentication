@@ -3,8 +3,10 @@ package com.example.authentication.service;
 import com.example.authentication.dto.RegistrationRequest;
 import com.example.authentication.dto.RegistrationResponse;
 import com.example.authentication.dto.UserDto;
+import com.example.authentication.event.NotificationEvent;
 import com.example.authentication.event.UserRegistrationData;
 import com.example.authentication.exception.EmailAlreadyInUseException;
+import com.example.authentication.exception.EmployeeIdAlreadyExistsException;
 import com.example.authentication.exception.ResourceNotFoundException;
 import com.example.authentication.exception.UsernameAlreadyTakenException;
 import com.example.authentication.model.*;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,19 +30,22 @@ public class UserService {
     private final UserCreationService userCreationService;
     private final RoleManagementService roleManagementService;
     private final ApprovalRequestService approvalRequestService;
-    private final PubSubService pubSubService;
+    private final NotificationService notificationService;
+    
+    @Autowired
+    private PermissionRepository permissionRepository;
 
     @Autowired
     public UserService(UserRepository userRepository,
                        UserCreationService userCreationService,
                        RoleManagementService roleManagementService,
                        ApprovalRequestService approvalRequestService,
-                       PubSubService pubSubService) {
+                       NotificationService notificationService) {
         this.userRepository = userRepository;
         this.userCreationService = userCreationService;
         this.roleManagementService = roleManagementService;
         this.approvalRequestService = approvalRequestService;
-        this.pubSubService = pubSubService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -61,9 +67,11 @@ public class UserService {
                             user.getUserId(),
                             user.getUsername(),
                             user.getEmail(),
-                            user.getFirstName(),
-                            user.getLastName(),
+                            user.getFullName(),
+                            user.getEmployeeId(),
                             user.getDepartment(),
+                            user.getDesignation(),
+                            user.getRegion(),
                             user.getCreatedAt(),
                             role
                         );
@@ -95,8 +103,15 @@ public class UserService {
             throw new EmailAlreadyInUseException(Constants.ERROR_EMAIL_IN_USE);
         }
 
+        if (userRepository.existsByEmployeeId(request.getEmployeeId())) {
+            throw new EmployeeIdAlreadyExistsException("Employee ID already exists");
+        }
+
         User user = userCreationService.createUser(request);
         Role role = roleManagementService.findRole(request.getRoleName());
+        
+        List<Permission> permissions = permissionRepository.findByPermissionNameIn(request.getPermissionNames());
+        user.setPermissions(new HashSet<>(permissions));
 
         User savedUser = userCreationService.saveUser(user);
         roleManagementService.assignRole(savedUser, role);
@@ -105,9 +120,13 @@ public class UserService {
 
         if (requiresApproval) {
             approvalRequestService.createApprovalRequest(savedUser);
-            approvalRequestService.notifyApprovalRequest(savedUser, role);
+  //          approvalRequestService.notifyApprovalRequest(savedUser, role);
         }
 
+        // Log the registration of the new user
+        logger.info("New user registered: id={}, username={}, email={}, fullName={}, employeeId={}, role={}",
+            savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(), 
+            savedUser.getFullName(), savedUser.getEmployeeId(), role.getRoleName());
         // Get RMG email
         String rmgEmail = userRepository.findRmgEmail()
             .orElseThrow(() -> new IllegalStateException("No active RMG user found in the system"));
@@ -117,11 +136,18 @@ public class UserService {
             savedUser.getUserId().toString(),
             savedUser.getUsername(),
             savedUser.getEmail(),
+            savedUser.getFullName(),
+            savedUser.getEmployeeId(),
+            savedUser.getDesignation(),
             role.getRoleName(),
             savedUser.getAccountStatus().toString(),
             rmgEmail
         );
-        pubSubService.publishUserRegistrationEvent(registrationData);
+
+        // Send the notification asynchronously
+        notificationService.sendUserRegistrationNotification(registrationData);
+
+        logger.info("Initiated sending of user registration notification for user: {}", savedUser.getUsername());
 
         return new RegistrationResponse(Constants.SUCCESS_USER_REGISTERED, savedUser.getUserId(), requiresApproval);
     }

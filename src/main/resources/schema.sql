@@ -1,14 +1,21 @@
 CREATE TABLE USERS (
     user_id INT PRIMARY KEY AUTO_INCREMENT,
     username VARCHAR(50) NOT NULL UNIQUE,
+    full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
-    first_name VARCHAR(50) NOT NULL,
-    last_name VARCHAR(50) NOT NULL,
-    department VARCHAR(100),
     password_hash VARCHAR(255) NOT NULL,
+    employee_id VARCHAR(50) NOT NULL UNIQUE,
+    phone_number VARCHAR(20),
+    designation VARCHAR(100),
+    region VARCHAR(100),
+    cost_center VARCHAR(100),
+    business_unit VARCHAR(100),
+    reporting_manager_email VARCHAR(100),
+    department VARCHAR(100),
     last_login DATETIME NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
     account_status ENUM('PENDING', 'ACTIVE', 'INACTIVE', 'REJECTED') NOT NULL DEFAULT 'PENDING',
+    profile_picture VARCHAR(255),
     created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     created_by INT NULL,
@@ -79,10 +86,64 @@ CREATE TABLE LOGIN_HISTORY (
 );
 
 -- Insert RMG test user (password: test123)
-INSERT INTO USERS (username, email, first_name, last_name, password_hash, account_status, is_active)
-VALUES ('rmg_test', 'rmg_test@example.com', 'RMG', 'Admin', 'test123', 'ACTIVE', TRUE);
+INSERT INTO USERS (username, full_name, email, password_hash, employee_id, designation, department, account_status, is_active)
+VALUES ('rmg_test', 'RMG Admin', 'rmg_test@example.com', '$2a$10$QYGLYLCVwFbAO0ZV7f5e5erEWmGpjPL.qMNC5hBhIqhfhO9UW9/jW', 'RMG001', 'RMG Administrator', 'Resource Management', 'ACTIVE', TRUE);
 
 -- Link RMG test user to RMG role
 INSERT INTO USER_ROLES (user_id, role_id)
 SELECT (SELECT user_id FROM USERS WHERE username = 'rmg_test'),
        (SELECT role_id FROM ROLES WHERE role_name = 'RMG');
+
+-- New tables and data
+
+CREATE TABLE PERMISSIONS (
+    permission_id INT PRIMARY KEY AUTO_INCREMENT,
+    permission_name VARCHAR(50) NOT NULL UNIQUE,
+    description VARCHAR(255),
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL,
+    updated_by INT NULL,
+    
+    FOREIGN KEY (created_by) REFERENCES USERS(user_id),
+    FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
+);
+
+CREATE TABLE USER_PERMISSIONS (
+    user_id INT NOT NULL,
+    permission_id INT NOT NULL,
+    assigned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    created_by INT NULL,
+    updated_by INT NULL,
+
+    PRIMARY KEY (user_id, permission_id),
+
+    FOREIGN KEY (user_id) REFERENCES USERS(user_id),
+    FOREIGN KEY (permission_id) REFERENCES PERMISSIONS(permission_id),
+    FOREIGN KEY (created_by) REFERENCES USERS(user_id),
+    FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
+);
+
+INSERT INTO PERMISSIONS (permission_name, description, created_by, updated_by)
+VALUES
+('rmg_dashboard', 'Access to RMG Dashboard', 1, 1),
+('rmg_approval', 'Access to RMG Approvals', 1, 1),
+('rmg_user_mng', 'Manage RMG Users', 1, 1),
+('rmg_notif', 'RMG Notifications', 1, 1),
+('rmg_interview_mng', 'Manage RMG Interviews', 1, 1),
+('rmg_pref', 'RMG Preferences', 1, 1),
+('rmg_candidate_pool', 'RMG Candidate Pool Access', 1, 1),
+('rmg_track_status', 'Track RMG Status', 1, 1),
+
+('mng_dashboard', 'Access to Manager Dashboard', 1, 1),
+('mng_notif', 'Manager Notifications', 1, 1),
+('mng_pref', 'Manager Preferences', 1, 1),
+('mng_app_status', 'Manager Application Status', 1, 1),
+('mng_jb', 'Manage Job Board', 1, 1);
+
+INSERT INTO USER_PERMISSIONS (user_id, permission_id, created_by, updated_by)
+SELECT 1 AS user_id, permission_id, 1 AS created_by, 1 AS updated_by
+FROM PERMISSIONS
+WHERE permission_name LIKE 'rmg%';
