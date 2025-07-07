@@ -9,6 +9,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
@@ -20,7 +21,9 @@ import java.util.concurrent.CompletionException;
 @Service
 public class AsyncNotificationServiceImpl implements NotificationService {
     private static final Logger logger = LoggerFactory.getLogger(AsyncNotificationServiceImpl.class);
-    private static final String NOTIFICATION_URL = "http://localhost:3000/api/notifications/process";
+
+    @Value("${notification.service.url}")
+    private String notificationUrl;
 
     private final RestTemplate restTemplate;
     private final ObjectMapper objectMapper;
@@ -42,7 +45,7 @@ public class AsyncNotificationServiceImpl implements NotificationService {
                 event.setTimestamp(Instant.now().toString());
                 event.setData(data);
 
-                String response = restTemplate.postForObject(NOTIFICATION_URL, event, String.class);
+                String response = restTemplate.postForObject(notificationUrl, event, String.class);
                 logger.info("Successfully sent user registration notification for user: {} with RMG email: {}. Response: {}", 
                     data.getUsername(), data.getRmgEmail(), response);
             } catch (Exception e) {
@@ -63,14 +66,19 @@ public class AsyncNotificationServiceImpl implements NotificationService {
         return CompletableFuture.runAsync(() -> {
             try {
                 logger.info("Attempting to send account approved notification for user: {}", data.getUsername());
-
+                String eventType="";
+                if(data.getApproved()==true) {
+                	eventType= Constants.EVENT_ACCOUNT_APPROVED;
+                }else {
+                	eventType=Constants.EVENT_ACCOUNT_REJECTED;
+                }
                 NotificationEvent<AccountApprovalData> event = new NotificationEvent<>(
-                    Constants.EVENT_ACCOUNT_APPROVED,
+                		eventType,
                     Instant.now().toString(),
                     data
                 );
 
-                String response = restTemplate.postForObject(NOTIFICATION_URL, event, String.class);
+                String response = restTemplate.postForObject(notificationUrl, event, String.class);
                 logger.info("Successfully sent account approved notification for user: {} approved by: {}. Response: {}", 
                     data.getUsername(), data.getApprovedBy(), response);
             } catch (Exception e) {

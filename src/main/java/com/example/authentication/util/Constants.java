@@ -11,6 +11,7 @@ public class Constants {
     // Event Types
     public static final String EVENT_USER_REGISTERED = "UserRegistered";
     public static final String EVENT_ACCOUNT_APPROVED = "AccountApproved";
+    public static final String EVENT_ACCOUNT_REJECTED = "AccountRejected";
 
     // Error Messages
     public static final String ERROR_USERNAME_TAKEN = "Error: Username is already taken!";
