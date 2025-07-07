@@ -6,3 +6,4 @@ src/main/resources/*.json
 
 # Ignore all log files and compressed log files
 Authentication/Authentication/logs/
+/logs/

@@ -20,9 +20,12 @@ public class Constants {
     // Success Messages
     public static final String SUCCESS_USER_REGISTERED = "User registered successfully!";
 
-    // PubSub Topic Names
-    public static final String TOPIC_USER_REGISTRATION = "UserRegisterEvent";
-    public static final String TOPIC_ACCOUNT_APPROVED = "AccountApprovedEvent";
+    // Notification Event Names
+    public static final String NOTIFICATION_USER_REGISTRATION = "UserRegisterNotification";
+    public static final String NOTIFICATION_ACCOUNT_APPROVED = "AccountApprovedNotification";
+
+    // Notification URL
+    public static final String NOTIFICATION_URL = "http://localhost:1000/api/notifications";
 
     private Constants() {
         // Private constructor to prevent instantiation

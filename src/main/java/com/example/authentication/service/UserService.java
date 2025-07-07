@@ -3,6 +3,7 @@ package com.example.authentication.service;
 import com.example.authentication.dto.RegistrationRequest;
 import com.example.authentication.dto.RegistrationResponse;
 import com.example.authentication.dto.UserDto;
+import com.example.authentication.event.NotificationEvent;
 import com.example.authentication.event.UserRegistrationData;
 import com.example.authentication.exception.EmailAlreadyInUseException;
 import com.example.authentication.exception.EmployeeIdAlreadyExistsException;
@@ -29,7 +30,7 @@ public class UserService {
     private final UserCreationService userCreationService;
     private final RoleManagementService roleManagementService;
     private final ApprovalRequestService approvalRequestService;
-    private final PubSubService pubSubService;
+    private final NotificationService notificationService;
     
     @Autowired
     private PermissionRepository permissionRepository;
@@ -39,12 +40,12 @@ public class UserService {
                        UserCreationService userCreationService,
                        RoleManagementService roleManagementService,
                        ApprovalRequestService approvalRequestService,
-                       PubSubService pubSubService) {
+                       NotificationService notificationService) {
         this.userRepository = userRepository;
         this.userCreationService = userCreationService;
         this.roleManagementService = roleManagementService;
         this.approvalRequestService = approvalRequestService;
-        this.pubSubService = pubSubService;
+        this.notificationService = notificationService;
     }
 
     @Transactional
@@ -142,10 +143,11 @@ public class UserService {
             savedUser.getAccountStatus().toString(),
             rmgEmail
         );
-        
-        pubSubService.publishUserRegistrationEvent(registrationData);
 
-        logger.info("Published user registration event for user: {}", savedUser.getUsername());
+        // Send the notification asynchronously
+        notificationService.sendUserRegistrationNotification(registrationData);
+
+        logger.info("Initiated sending of user registration notification for user: {}", savedUser.getUsername());
 
         return new RegistrationResponse(Constants.SUCCESS_USER_REGISTERED, savedUser.getUserId(), requiresApproval);
     }

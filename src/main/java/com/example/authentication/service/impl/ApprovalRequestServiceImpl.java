@@ -10,7 +10,7 @@ import com.example.authentication.model.User;
 import com.example.authentication.repository.AccountApprovalRequestRepository;
 import com.example.authentication.repository.UserRepository;
 import com.example.authentication.service.ApprovalRequestService;
-import com.example.authentication.service.PubSubService;
+import com.example.authentication.service.NotificationService;
 import com.example.authentication.util.Constants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,15 +24,15 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
     private static final Logger logger = LoggerFactory.getLogger(ApprovalRequestServiceImpl.class);
 
     private final AccountApprovalRequestRepository accountApprovalRequestRepository;
-    private final PubSubService pubSubService;
+    private final NotificationService notificationService;
     private final UserRepository userRepository;
 
     @Autowired
     public ApprovalRequestServiceImpl(AccountApprovalRequestRepository accountApprovalRequestRepository,
-                                    PubSubService pubSubService,
+                                    NotificationService notificationService,
                                     UserRepository userRepository) {
         this.accountApprovalRequestRepository = accountApprovalRequestRepository;
-        this.pubSubService = pubSubService;
+        this.notificationService = notificationService;
         this.userRepository = userRepository;
     }
 
@@ -81,9 +81,9 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
             false    // Set approval to false for rejection
         );
 
-        pubSubService.publishAccountApprovedEvent(approvalData)
+        notificationService.sendAccountApprovedNotification(approvalData)
             .exceptionally(throwable -> {
-                logger.warn("Failed to publish account rejection event, but account rejection completed successfully", throwable);
+                logger.warn("Failed to send account rejection notification, but account rejection completed successfully", throwable);
                 return null;
             });
 
@@ -124,9 +124,9 @@ public class ApprovalRequestServiceImpl implements ApprovalRequestService {
             true  // Set to true for approval
         );
         
-        pubSubService.publishAccountApprovedEvent(approvalData)
+        notificationService.sendAccountApprovedNotification(approvalData)
             .exceptionally(throwable -> {
-                logger.warn("Failed to publish account approved event, but account approval completed successfully", throwable);
+                logger.warn("Failed to send account approved notification, but account approval completed successfully", throwable);
                 return null;
             });
 
