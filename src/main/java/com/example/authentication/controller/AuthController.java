@@ -1,9 +1,6 @@
 package com.example.authentication.controller;
 
-import com.example.authentication.dto.LoginRequest;
-import com.example.authentication.dto.LoginResponse;
-import com.example.authentication.dto.RegistrationRequest;
-import com.example.authentication.dto.RegistrationResponse;
+import com.example.authentication.dto.*;
 import com.example.authentication.response.ApiResponse;
 import com.example.authentication.service.AuthenticationService;
 import com.example.authentication.service.ResponseService;
@@ -44,5 +41,11 @@ public class AuthController {
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody String refreshToken) {
         LoginResponse loginResponse = authenticationService.refreshToken(refreshToken);
         return ResponseEntity.ok(responseService.successResponse(loginResponse));
+    }
+
+    @PostMapping("/unlock")
+    public ResponseEntity<ApiResponse<String>> unlockAccount(@Valid @RequestBody UnlockAccountRequest unlockAccountRequest) {
+        authenticationService.unlockAccount(unlockAccountRequest);
+        return ResponseEntity.ok(responseService.successResponse("Account unlocked successfully"));
     }
 }

@@ -2,6 +2,7 @@ package com.example.authentication.service.impl;
 
 import com.example.authentication.dto.LoginRequest;
 import com.example.authentication.dto.LoginResponse;
+import com.example.authentication.dto.UnlockAccountRequest;
 import com.example.authentication.dto.UserDto;
 import com.example.authentication.exception.EmailNotFoundException;
 import com.example.authentication.exception.InactiveAccountException;
@@ -159,5 +160,18 @@ private UserDto createUserDto(User user) {
         
         System.out.println("Debug - Created UserDto: " + userDto);
         return userDto;
+    }
+
+    @Override
+    @Transactional
+    public void unlockAccount(UnlockAccountRequest unlockAccountRequest) {
+        User user = userRepository.findByEmail(unlockAccountRequest.getEmail())
+                .orElseThrow(() -> new EmailNotFoundException("No account found with this email address"));
+
+        user.setFailedLoginAttempts(0);
+        user.setAccountLocked(false);
+        user.setLockTime(null);
+        user.setAccountStatus(User.AccountStatus.ACTIVE);
+        userRepository.save(user);
     }
 }
