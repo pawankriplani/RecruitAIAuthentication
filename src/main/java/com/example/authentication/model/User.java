@@ -63,6 +63,15 @@ public class User {
     @Column(name = "account_status", nullable = false)
     private AccountStatus accountStatus = AccountStatus.PENDING;
 
+    @Column(name = "failed_login_attempts", nullable = false)
+    private Integer failedLoginAttempts = 0;
+
+    @Column(name = "account_locked", nullable = false)
+    private Boolean accountLocked = false;
+
+    @Column(name = "lock_time")
+    private LocalDateTime lockTime;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -277,6 +286,30 @@ public class User {
     }
 
     public enum AccountStatus {
-        PENDING, ACTIVE, INACTIVE, REJECTED
+        PENDING, ACTIVE, INACTIVE, REJECTED, LOCKED
+    }
+
+    public Integer getFailedLoginAttempts() {
+        return failedLoginAttempts;
+    }
+
+    public void setFailedLoginAttempts(Integer failedLoginAttempts) {
+        this.failedLoginAttempts = failedLoginAttempts;
+    }
+
+    public Boolean getAccountLocked() {
+        return accountLocked;
+    }
+
+    public void setAccountLocked(Boolean accountLocked) {
+        this.accountLocked = accountLocked;
+    }
+
+    public LocalDateTime getLockTime() {
+        return lockTime;
+    }
+
+    public void setLockTime(LocalDateTime lockTime) {
+        this.lockTime = lockTime;
     }
 }
