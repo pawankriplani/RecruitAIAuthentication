@@ -17,6 +17,12 @@ public class Constants {
     public static final String ERROR_USERNAME_TAKEN = "Error: Username is already taken!";
     public static final String ERROR_EMAIL_IN_USE = "Error: Email is already in use!";
     public static final String ERROR_ROLE_NOT_FOUND = "Error: Role is not found.";
+    public static final String INVALID_CREDENTIALS_MESSAGE = "Invalid email or password";
+    public static final String INVALID_PASSWORD_MESSAGE = "Invalid password. %d attempts remaining before account lockout.";
+    public static final String ACCOUNT_LOCKED_MESSAGE = "Account has been locked due to too many failed attempts. Please contact administrator.";
+
+    // Authentication Settings
+    public static final int MAX_FAILED_ATTEMPTS = 5;
 
     // Success Messages
     public static final String SUCCESS_USER_REGISTERED = "User registered successfully!";

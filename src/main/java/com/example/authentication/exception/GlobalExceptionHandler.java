@@ -186,4 +186,14 @@ public class GlobalExceptionHandler {
         );
         return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
     }
+
+    @ExceptionHandler(InvalidPasswordException.class)
+    public ResponseEntity<ApiResponse<Object>> handleInvalidPassword(InvalidPasswordException ex) {
+        logger.warn("Invalid password attempt", ex);
+        ApiResponse<Object> response = ApiResponse.error(
+            HttpStatus.UNAUTHORIZED.value(),
+            ex.getMessage()
+        );
+        return new ResponseEntity<>(response, HttpStatus.UNAUTHORIZED);
+    }
 }

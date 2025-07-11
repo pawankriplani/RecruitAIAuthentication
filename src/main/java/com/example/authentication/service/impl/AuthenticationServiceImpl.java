@@ -4,10 +4,8 @@ import com.example.authentication.dto.LoginRequest;
 import com.example.authentication.dto.LoginResponse;
 import com.example.authentication.dto.UnlockAccountRequest;
 import com.example.authentication.dto.UserDto;
-import com.example.authentication.exception.EmailNotFoundException;
-import com.example.authentication.exception.InactiveAccountException;
-import com.example.authentication.exception.PendingAccountException;
-import com.example.authentication.exception.RejectedAccountException;
+import com.example.authentication.exception.*;
+import com.example.authentication.util.Constants;
 import com.example.authentication.model.User;
 import com.example.authentication.model.UserRole;
 import com.example.authentication.model.AccountApprovalRequest;
@@ -44,7 +42,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 @Override
-@Transactional
+
 public LoginResponse login(LoginRequest loginRequest) {
     User user = userRepository.findByEmailWithRoles(loginRequest.getEmail())
             .orElseThrow(() -> new EmailNotFoundException("No account found with this email address"));
@@ -53,8 +51,11 @@ public LoginResponse login(LoginRequest loginRequest) {
 
     // Check password
     if (!passwordEncoder.matches(loginRequest.getPassword(), user.getPasswordHash())) {
-        throw new BadCredentialsException("Invalid password");
+        handleFailedLogin(user);
     }
+
+    // Reset failed attempts on successful login
+    resetFailedAttempts(user);
 
     // Update last login
     user.setLastLogin(LocalDateTime.now());
@@ -173,5 +174,31 @@ private UserDto createUserDto(User user) {
         user.setLockTime(null);
         user.setAccountStatus(User.AccountStatus.ACTIVE);
         userRepository.save(user);
+    }
+
+    private void handleFailedLogin(User user) {
+        user.setFailedLoginAttempts(user.getFailedLoginAttempts() + 1);
+        int remainingAttempts = Constants.MAX_FAILED_ATTEMPTS - user.getFailedLoginAttempts();
+        
+        String message;
+        if (remainingAttempts > 0) {
+            message = String.format(Constants.INVALID_PASSWORD_MESSAGE, remainingAttempts);
+        } else {
+            message = Constants.ACCOUNT_LOCKED_MESSAGE;
+            user.setAccountLocked(true);
+            user.setLockTime(LocalDateTime.now());
+        }
+        
+        userRepository.save(user);
+        throw new InvalidPasswordException(message);
+    }
+
+    private void resetFailedAttempts(User user) {
+        if (user.getFailedLoginAttempts() > 0) {
+            user.setFailedLoginAttempts(0);
+            user.setAccountLocked(false);
+            user.setLockTime(null);
+            userRepository.save(user);
+        }
     }
 }
