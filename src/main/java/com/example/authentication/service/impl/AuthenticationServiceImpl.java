@@ -7,6 +7,7 @@ import com.example.authentication.dto.UserDto;
 import com.example.authentication.exception.*;
 import com.example.authentication.util.Constants;
 import com.example.authentication.model.User;
+import com.example.authentication.model.User.AccountStatus;
 import com.example.authentication.model.UserRole;
 import com.example.authentication.model.AccountApprovalRequest;
 import com.example.authentication.repository.UserRepository;
@@ -19,6 +20,8 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDateTime;
 import java.util.Collections;
@@ -27,7 +30,8 @@ import java.util.stream.Collectors;
 
 @Service
 public class AuthenticationServiceImpl implements AuthenticationService {
-
+    
+    private static final Logger logger = LoggerFactory.getLogger(AuthenticationServiceImpl.class);
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
     private final JwtUtil jwtUtil;
@@ -74,22 +78,30 @@ public LoginResponse login(LoginRequest loginRequest) {
 }
 
 private void checkAccountStatus(User user) {
-    if (!user.getIsActive()) {
-        throw new InactiveAccountException("Your account is currently inactive. Please contact the administrator.");
-    }
+//    if (!user.getAccountLocked()) {
+//        logger.warn("Login attempt on inactive account: {}", user.getEmail());
+//        throw new InactiveAccountException("Your account is currently inactive. Please contact the administrator.");
+//    }
     
     switch (user.getAccountStatus()) {
+        case LOCKED:
+            logger.warn("Login attempt on locked account: {}", user.getEmail());
+            throw new InvalidPasswordException("Account has been locked due to too many failed attempts. Please contact administrator.");
         case PENDING:
+            logger.warn("Login attempt on pending account: {}", user.getEmail());
             throw new PendingAccountException("Your account is pending approval. Please wait for admin confirmation.");
         case INACTIVE:
+            logger.warn("Login attempt on inactive account: {}", user.getEmail());
             throw new InactiveAccountException("Your account is currently inactive. Please contact the administrator.");
         case REJECTED:
+            logger.warn("Login attempt on rejected account: {}", user.getEmail());
             throw new RejectedAccountException("Your account registration has been rejected. Please contact the administrator for more information.");
         case ACTIVE:
             // Proceed with login
             break;
     }
 }
+
 
     @Override
     public LoginResponse refreshToken(String refreshToken) {
@@ -182,10 +194,13 @@ private UserDto createUserDto(User user) {
         
         String message;
         if (remainingAttempts > 0) {
+            logger.warn("Failed login attempt for user: {}. Remaining attempts: {}", user.getEmail(), remainingAttempts);
             message = String.format(Constants.INVALID_PASSWORD_MESSAGE, remainingAttempts);
         } else {
+            logger.warn("Account locked for user: {} due to {} failed attempts", user.getEmail(), Constants.MAX_FAILED_ATTEMPTS);
             message = Constants.ACCOUNT_LOCKED_MESSAGE;
             user.setAccountLocked(true);
+            user.setAccountStatus(AccountStatus.LOCKED);
             user.setLockTime(LocalDateTime.now());
         }
         

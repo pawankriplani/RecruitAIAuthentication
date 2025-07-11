@@ -23,6 +23,8 @@ public class Constants {
 
     // Authentication Settings
     public static final int MAX_FAILED_ATTEMPTS = 5;
+    public static final int LOCK_DURATION_MINUTES = 30;
+    public static final String ACCOUNT_LOCKED_DURATION_MESSAGE = "Account is locked. Please try again after %d minutes.";
 
     // Success Messages
     public static final String SUCCESS_USER_REGISTERED = "User registered successfully!";
