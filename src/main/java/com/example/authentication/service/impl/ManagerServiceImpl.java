@@ -1,6 +1,7 @@
 package com.example.authentication.service.impl;
 
 import com.example.authentication.dto.ManagerDTO;
+import com.example.authentication.dto.ManagerStatsDTO;
 import com.example.authentication.model.User;
 import com.example.authentication.repository.UserRepository;
 import com.example.authentication.service.ManagerService;
@@ -23,7 +24,16 @@ public class ManagerServiceImpl implements ManagerService {
 
     @Override
     @Transactional(readOnly = true)
-    public List<ManagerDTO> getAllManagers() {
+    public ManagerStatsDTO getAllManagersWithStats() {
+        List<ManagerDTO> managers = getAllManagers();
+        long totalManagers = userRepository.countTotalManagers();
+        long activeManagers = userRepository.countActiveManagers();
+        long pendingManagers = userRepository.countPendingManagers();
+        
+        return new ManagerStatsDTO(managers, totalManagers, activeManagers, pendingManagers);
+    }
+
+    private List<ManagerDTO> getAllManagers() {
         List<User> managers = userRepository.findAllManagers();
         return managers.stream()
                 .map(this::convertToDTO)

@@ -27,4 +27,13 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role r WHERE r.roleName = 'Manager'")
     List<User> findAllManagers();
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'Manager'")
+    long countTotalManagers();
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'Manager' AND u.isActive = true AND u.accountStatus = 'ACTIVE'")
+    long countActiveManagers();
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'Manager' AND u.accountStatus = 'PENDING'")
+    long countPendingManagers();
 }
