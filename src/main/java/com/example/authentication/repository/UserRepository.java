@@ -24,4 +24,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u FROM User u WHERE u.accountStatus = 'PENDING'")
     List<User> findPendingUsers();
+
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role r WHERE r.roleName = 'Manager'")
+    List<User> findAllManagers();
 }
