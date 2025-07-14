@@ -34,7 +34,7 @@ public class ManagerServiceImpl implements ManagerService {
     }
 
     private List<ManagerDTO> getAllManagers() {
-        List<User> managers = userRepository.findAllManagers();
+        List<User> managers = userRepository.findNonPendingManagers();
         return managers.stream()
                 .map(this::convertToDTO)
                 .collect(Collectors.toList());
