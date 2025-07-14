@@ -181,10 +181,14 @@ private UserDto createUserDto(User user) {
         User user = userRepository.findByEmail(unlockAccountRequest.getEmail())
                 .orElseThrow(() -> new EmailNotFoundException("No account found with this email address"));
 
+        if (!unlockAccountRequest.getStatus().equals("BLOCKED") && !unlockAccountRequest.getStatus().equals("ACTIVE")) {
+            throw new IllegalArgumentException("Invalid status. Must be either BLOCKED or ACTIVE");
+        }
+
         user.setFailedLoginAttempts(0);
-        user.setAccountLocked(false);
-        user.setLockTime(null);
-        user.setAccountStatus(User.AccountStatus.ACTIVE);
+        user.setAccountLocked(unlockAccountRequest.getStatus().equals("BLOCKED"));
+        user.setLockTime(unlockAccountRequest.getStatus().equals("BLOCKED") ? LocalDateTime.now() : null);
+        user.setAccountStatus(User.AccountStatus.valueOf(unlockAccountRequest.getStatus()));
         userRepository.save(user);
     }
 

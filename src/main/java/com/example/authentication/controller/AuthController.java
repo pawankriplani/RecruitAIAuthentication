@@ -43,9 +43,10 @@ public class AuthController {
         return ResponseEntity.ok(responseService.successResponse(loginResponse));
     }
 
-    @PostMapping("/unlock")
+    @PostMapping("/update-account-status")
     public ResponseEntity<ApiResponse<String>> unlockAccount(@Valid @RequestBody UnlockAccountRequest unlockAccountRequest) {
         authenticationService.unlockAccount(unlockAccountRequest);
-        return ResponseEntity.ok(responseService.successResponse("Account unlocked successfully"));
+        String message = String.format("Account status updated to %s successfully", unlockAccountRequest.getStatus());
+        return ResponseEntity.ok(responseService.successResponse(message));
     }
 }

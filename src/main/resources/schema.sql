@@ -14,7 +14,7 @@ CREATE TABLE USERS (
     department VARCHAR(100),
     last_login DATETIME NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    account_status ENUM('PENDING', 'ACTIVE', 'INACTIVE', 'REJECTED', 'LOCKED') NOT NULL DEFAULT 'PENDING',
+    account_status ENUM('PENDING', 'ACTIVE', 'INACTIVE', 'REJECTED', 'LOCKED','BLOCKED') NOT NULL DEFAULT 'PENDING',
     failed_login_attempts INT NOT NULL DEFAULT 0,
     account_locked BOOLEAN NOT NULL DEFAULT FALSE,
     lock_time DATETIME NULL,

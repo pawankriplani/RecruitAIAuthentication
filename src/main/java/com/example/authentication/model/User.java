@@ -286,7 +286,7 @@ public class User {
     }
 
     public enum AccountStatus {
-        PENDING, ACTIVE, INACTIVE, REJECTED, LOCKED
+        PENDING, ACTIVE, INACTIVE, REJECTED, LOCKED, BLOCKED
     }
 
     public Integer getFailedLoginAttempts() {
