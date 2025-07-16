@@ -93,7 +93,8 @@ public class UserService {
                 return new ResourceNotFoundException("User not found with id: " + userId);
             });
     }
-
+    
+    @Transactional
     public RegistrationResponse registerUser(RegistrationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UsernameAlreadyTakenException(Constants.ERROR_USERNAME_TAKEN);

@@ -24,6 +24,6 @@ public class AuthenticationApplication {
 
     @EventListener(ApplicationReadyEvent.class)
     public void printH2ConsoleUrl() {
-        System.out.println("H2 Console: http://localhost:" + serverPort + "/h2-console");
+        System.out.println("http://localhost:" + serverPort );
     }
 }
