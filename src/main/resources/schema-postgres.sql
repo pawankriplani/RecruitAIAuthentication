@@ -1,5 +1,13 @@
+DROP TABLE IF EXISTS USER_PERMISSIONS;
+DROP TABLE IF EXISTS PERMISSIONS;
+DROP TABLE IF EXISTS USER_ROLES;
+DROP TABLE IF EXISTS ACCOUNT_APPROVAL_REQUESTS;
+DROP TABLE IF EXISTS LOGIN_HISTORY;
+DROP TABLE IF EXISTS ROLES;
+DROP TABLE IF EXISTS USERS;
+
 CREATE TABLE USERS (
-    user_id INT PRIMARY KEY AUTO_INCREMENT,
+    user_id SERIAL PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
     full_name VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL UNIQUE,
@@ -12,29 +20,29 @@ CREATE TABLE USERS (
     business_unit VARCHAR(100),
     reporting_manager_email VARCHAR(100),
     department VARCHAR(100),
-    last_login DATETIME NULL,
+    last_login TIMESTAMP NULL,
     is_active BOOLEAN NOT NULL DEFAULT TRUE,
-    account_status ENUM('PENDING', 'ACTIVE', 'INACTIVE', 'REJECTED', 'LOCKED','BLOCKED') NOT NULL DEFAULT 'PENDING',
+    account_status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (account_status IN ('PENDING', 'ACTIVE', 'INACTIVE', 'REJECTED', 'LOCKED', 'BLOCKED')),
     failed_login_attempts INT NOT NULL DEFAULT 0,
     account_locked BOOLEAN NOT NULL DEFAULT FALSE,
-    lock_time DATETIME NULL,
+    lock_time TIMESTAMP NULL,
     profile_picture VARCHAR(255),
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_by INT NULL,
-    updated_by INT NULL,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
     FOREIGN KEY (created_by) REFERENCES USERS(user_id),
     FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
 );
 
 CREATE TABLE ROLES (
-    role_id INT PRIMARY KEY AUTO_INCREMENT,
+    role_id SERIAL PRIMARY KEY,
     role_name VARCHAR(50) NOT NULL UNIQUE,
-    description TEXT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_by INT NULL,
-    updated_by INT NULL,
+    description TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
     FOREIGN KEY (created_by) REFERENCES USERS(user_id),
     FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
 );
@@ -47,11 +55,11 @@ INSERT INTO ROLES (role_name, description) VALUES
 CREATE TABLE USER_ROLES (
     user_id INT NOT NULL,
     role_id INT NOT NULL,
-    assigned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_by INT NULL,
-    updated_by INT NULL,
+    assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
     PRIMARY KEY (user_id, role_id),
     FOREIGN KEY (user_id) REFERENCES USERS(user_id),
     FOREIGN KEY (role_id) REFERENCES ROLES(role_id),
@@ -60,30 +68,30 @@ CREATE TABLE USER_ROLES (
 );
 
 CREATE TABLE ACCOUNT_APPROVAL_REQUESTS (
-    request_id INT PRIMARY KEY AUTO_INCREMENT,
+    request_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    status ENUM('PENDING', 'APPROVED', 'REJECTED') NOT NULL DEFAULT 'PENDING',
-    requested_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    rejection_reason TEXT NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_by INT NULL,
-    updated_by INT NULL,
+    status VARCHAR(20) NOT NULL DEFAULT 'PENDING' CHECK (status IN ('PENDING', 'APPROVED', 'REJECTED')),
+    requested_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    rejection_reason TEXT,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
     FOREIGN KEY (user_id) REFERENCES USERS(user_id),
     FOREIGN KEY (created_by) REFERENCES USERS(user_id),
     FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
 );
 
 CREATE TABLE LOGIN_HISTORY (
-    login_id INT PRIMARY KEY AUTO_INCREMENT,
+    login_id SERIAL PRIMARY KEY,
     user_id INT NOT NULL,
-    login_time DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    login_time TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     ip_address VARCHAR(45) NOT NULL,
     user_agent TEXT NOT NULL,
     success BOOLEAN NOT NULL,
-    failure_reason VARCHAR(255) NULL,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_by INT NULL,
+    failure_reason VARCHAR(255),
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
     FOREIGN KEY (user_id) REFERENCES USERS(user_id),
     FOREIGN KEY (created_by) REFERENCES USERS(user_id)
 );
@@ -94,20 +102,18 @@ VALUES ('rmg_test', 'RMG Admin', 'rmg_test@example.com', '$2a$10$QYGLYLCVwFbAO0Z
 
 -- Link RMG test user to RMG role
 INSERT INTO USER_ROLES (user_id, role_id)
-SELECT (SELECT user_id FROM USERS WHERE username = 'rmg_test'),
-       (SELECT role_id FROM ROLES WHERE role_name = 'RMG');
-
--- New tables and data
+SELECT u.user_id, r.role_id
+FROM USERS u, ROLES r
+WHERE u.username = 'rmg_test' AND r.role_name = 'RMG';
 
 CREATE TABLE PERMISSIONS (
-    permission_id INT PRIMARY KEY AUTO_INCREMENT,
+    permission_id SERIAL PRIMARY KEY,
     permission_name VARCHAR(50) NOT NULL UNIQUE,
     description VARCHAR(255),
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_by INT NULL,
-    updated_by INT NULL,
-    
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
     FOREIGN KEY (created_by) REFERENCES USERS(user_id),
     FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
 );
@@ -115,14 +121,12 @@ CREATE TABLE PERMISSIONS (
 CREATE TABLE USER_PERMISSIONS (
     user_id INT NOT NULL,
     permission_id INT NOT NULL,
-    assigned_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-    created_by INT NULL,
-    updated_by INT NULL,
-
+    assigned_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_by INT,
+    updated_by INT,
     PRIMARY KEY (user_id, permission_id),
-
     FOREIGN KEY (user_id) REFERENCES USERS(user_id),
     FOREIGN KEY (permission_id) REFERENCES PERMISSIONS(permission_id),
     FOREIGN KEY (created_by) REFERENCES USERS(user_id),
@@ -139,7 +143,6 @@ VALUES
 ('rmg_pref', 'RMG Preferences', 1, 1),
 ('rmg_candidate_pool', 'RMG Candidate Pool Access', 1, 1),
 ('rmg_track_status', 'Track RMG Status', 1, 1),
-
 ('mng_dashboard', 'Access to Manager Dashboard', 1, 1),
 ('mng_notif', 'Manager Notifications', 1, 1),
 ('mng_pref', 'Manager Preferences', 1, 1),
@@ -147,6 +150,6 @@ VALUES
 ('mng_jb', 'Manage Job Board', 1, 1);
 
 INSERT INTO USER_PERMISSIONS (user_id, permission_id, created_by, updated_by)
-SELECT 1 AS user_id, permission_id, 1 AS created_by, 1 AS updated_by
-FROM PERMISSIONS
-WHERE permission_name LIKE 'rmg%';
+SELECT 1, p.permission_id, 1, 1
+FROM PERMISSIONS p
+WHERE p.permission_name LIKE 'rmg%';

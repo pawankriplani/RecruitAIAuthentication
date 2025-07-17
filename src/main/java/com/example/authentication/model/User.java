@@ -86,10 +86,12 @@ public class User {
     @JoinColumn(name = "updated_by")
     private User updatedBy;
 
-    @OneToMany(mappedBy = "user", fetch = FetchType.EAGER)
+    @OneToMany(mappedBy = "user", fetch = FetchType.LAZY)
+    @org.hibernate.annotations.BatchSize(size = 20)
     private Set<UserRole> userRoles;
 
     @ManyToMany(fetch = FetchType.LAZY)
+    @org.hibernate.annotations.BatchSize(size = 20)
     @JoinTable(
         name = "USER_PERMISSIONS",
         joinColumns = @JoinColumn(name = "user_id"),
