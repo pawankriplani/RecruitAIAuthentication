@@ -46,9 +46,9 @@ public class AuthenticationServiceImpl implements AuthenticationService {
     }
 
 @Override
-
+@Transactional
 public LoginResponse login(LoginRequest loginRequest) {
-    User user = userRepository.findByEmailWithRoles(loginRequest.getEmail())
+    User user = userRepository.findByEmailWithRolesAndPermissions(loginRequest.getEmail())
             .orElseThrow(() -> new EmailNotFoundException("No account found with this email address"));
     
     checkAccountStatus(user);
