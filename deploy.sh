@@ -6,8 +6,8 @@ set -e
 # Define variables
 PROJECT_ID="telusrecruitai"
 IMAGE_NAME="recruitai-authentication"
-REGION="us-central1"  # Change this to your preferred region
-SERVICE_NAME="recruitai-authentication-service"
+REGION="asia-south1"  # Change this to your preferred region
+SERVICE_NAME="recruitai-authentication-new"
 
 # Build the Docker image
 docker build -t $IMAGE_NAME .
