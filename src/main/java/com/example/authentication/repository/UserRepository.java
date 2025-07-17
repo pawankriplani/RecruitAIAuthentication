@@ -19,6 +19,9 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role WHERE u.email = :email")
     Optional<User> findByEmailWithRoles(@Param("email") String email);
 
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role LEFT JOIN FETCH u.permissions WHERE u.email = :email")
+    Optional<User> findByEmailWithRolesAndPermissions(@Param("email") String email);
+
     @Query("SELECT u.email FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'RMG' AND u.isActive = true AND u.accountStatus = 'ACTIVE'")
     Optional<String> findRmgEmail();
 
@@ -26,7 +29,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     List<User> findPendingUsers();
 
    // @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role r WHERE r.roleName = 'Manager'")
-    @Query("SELECT u FROM User u JOIN u.userRoles ur WHERE ur.role.roleName = 'Manager' AND u.accountStatus != 'PENDING'")
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role r WHERE r.roleName = 'Manager' AND u.accountStatus != 'PENDING'")
     List<User> findNonPendingManagers();
 
     @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'Manager'")
