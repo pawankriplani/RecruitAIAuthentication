@@ -45,7 +45,7 @@ public class AsyncNotificationServiceImpl implements NotificationService {
                 event.setTimestamp(Instant.now().toString());
                 event.setData(data);
 
-                String response = restTemplate.postForObject(notificationUrl, event, String.class);
+                String response = restTemplate.postForObject(notificationUrl+"/api/notifications/process", event, String.class);
                 logger.info("Successfully sent user registration notification for user: {} with RMG email: {}. Response: {}", 
                     data.getUsername(), data.getRmgEmail(), response);
             } catch (Exception e) {
@@ -78,7 +78,7 @@ public class AsyncNotificationServiceImpl implements NotificationService {
                     data
                 );
 
-                String response = restTemplate.postForObject(notificationUrl, event, String.class);
+                String response = restTemplate.postForObject(notificationUrl+"/api/notifications/process", event, String.class);
                 logger.info("Successfully sent account approved notification for user: {} approved by: {}. Response: {}", 
                     data.getUsername(), data.getApprovedBy(), response);
             } catch (Exception e) {
