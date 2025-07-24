@@ -48,6 +48,42 @@ public class UserService {
         this.notificationService = notificationService;
     }
 
+    @Transactional(readOnly = true)
+    public UserDto convertToDto(User user) {
+        logger.debug("Converting user to DTO: id={}, username={}, email={}", 
+            user.getUserId(), user.getUsername(), user.getEmail());
+        
+        String role = user.getUserRoles().stream()
+            .map(userRole -> userRole.getRole().getRoleName())
+            .findFirst().orElse("User");
+        
+        List<String> permissionNames = user.getPermissions().stream()
+            .map(Permission::getPermissionName)
+            .distinct()
+            .collect(Collectors.toList());
+            
+        UserDto userDto = new UserDto(
+            user.getUserId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getFullName(),
+            user.getEmployeeId(),
+            user.getPhoneNumber(),
+            user.getDesignation(),
+            user.getRegion(),
+            user.getCostCenter(),
+            user.getBusinessUnit(),
+            user.getReportingManagerEmail(),
+            user.getDepartment(),
+            user.getProfilePicture(),
+            user.getCreatedAt().toString(), // Convert to string
+            role,
+            permissionNames
+        );
+        
+        return userDto;
+    }
+
     @Transactional
     public List<UserDto> getPendingUsers() {
         logger.debug("Fetching pending users");
@@ -56,35 +92,7 @@ public class UserService {
         
         try {
             List<UserDto> userDtos = pendingUsers.stream()
-                    .map(user -> {
-                        logger.debug("Mapping user: id={}, username={}, email={}", 
-                            user.getUserId(), user.getUsername(), user.getEmail());
-                        String role = user.getUserRoles().stream()
-                            .map(userRole -> userRole.getRole().getRoleName())
-                            .findFirst()
-                            .orElse("User");
-                        List<String> permissionNames = user.getPermissions().stream()
-                            .map(Permission::getPermissionName)
-                            .collect(Collectors.toList());
-                        return new UserDto(
-                            user.getUserId(),
-                            user.getUsername(),
-                            user.getEmail(),
-                            user.getFullName(),
-                            user.getEmployeeId(),
-                            user.getPhoneNumber(),
-                            user.getDesignation(),
-                            user.getRegion(),
-                            user.getCostCenter(),
-                            user.getBusinessUnit(),
-                            user.getReportingManagerEmail(),
-                            user.getDepartment(),
-                            user.getProfilePicture(),
-                            user.getCreatedAt().toString(),
-                            role,
-                            permissionNames
-                        );
-                    })
+                    .map(this::convertToDto)
                     .collect(Collectors.toList());
             logger.debug("Successfully mapped {} users to DTOs", userDtos.size());
             return userDtos;
