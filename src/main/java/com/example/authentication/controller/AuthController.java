@@ -49,4 +49,6 @@ public class AuthController {
         String message = String.format("Account status updated to %s successfully", unlockAccountRequest.getStatus());
         return ResponseEntity.ok(responseService.successResponse(message));
     }
+
+    
 }

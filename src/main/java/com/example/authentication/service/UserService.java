@@ -63,17 +63,26 @@ public class UserService {
                             .map(userRole -> userRole.getRole().getRoleName())
                             .findFirst()
                             .orElse("User");
+                        List<String> permissionNames = user.getPermissions().stream()
+                            .map(Permission::getPermissionName)
+                            .collect(Collectors.toList());
                         return new UserDto(
                             user.getUserId(),
                             user.getUsername(),
                             user.getEmail(),
                             user.getFullName(),
                             user.getEmployeeId(),
-                            user.getDepartment(),
+                            user.getPhoneNumber(),
                             user.getDesignation(),
                             user.getRegion(),
-                            user.getCreatedAt(),
-                            role
+                            user.getCostCenter(),
+                            user.getBusinessUnit(),
+                            user.getReportingManagerEmail(),
+                            user.getDepartment(),
+                            user.getProfilePicture(),
+                            user.getCreatedAt().toString(),
+                            role,
+                            permissionNames
                         );
                     })
                     .collect(Collectors.toList());
