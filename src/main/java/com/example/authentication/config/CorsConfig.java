@@ -16,7 +16,7 @@ public class CorsConfig {
         configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","https://telusrecruitai-865090871947.asia-south1.run.app","https://kong-dp-865090871947.asia-south1.run.app"));
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"));
         configuration.setAllowedHeaders(Arrays.asList("*"));
-        configuration.setAllowCredentia ls(true);
+        configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
         return source;
