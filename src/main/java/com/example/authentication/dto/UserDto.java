@@ -1,6 +1,5 @@
 package com.example.authentication.dto;
 
-import java.time.LocalDateTime;
 import java.util.List;
 
 public class UserDto {
@@ -17,33 +16,32 @@ public class UserDto {
     private String reportingManagerEmail;
     private String department;
     private String profilePicture;
-    private LocalDateTime createdAt;
+    private String createdAt;
     private String role;
     private List<String> permissionNames;
 
     public UserDto() {
     }
 
-    public UserDto(Integer id, String username, String email, String fullName, String employeeId, String department, 
-                  String designation, String region, LocalDateTime createdAt, String role) {
+    public UserDto(Integer id, String username, String email, String fullName, String employeeId, String phoneNumber,
+                   String designation, String region, String costCenter, String businessUnit, String reportingManagerEmail,
+                   String department, String profilePicture, String createdAt, String role, List<String> permissionNames) {
         this.id = id;
         this.username = username;
         this.email = email;
         this.fullName = fullName;
         this.employeeId = employeeId;
-        this.department = department;
+        this.phoneNumber = phoneNumber;
         this.designation = designation;
         this.region = region;
+        this.costCenter = costCenter;
+        this.businessUnit = businessUnit;
+        this.reportingManagerEmail = reportingManagerEmail;
+        this.department = department;
+        this.profilePicture = profilePicture;
         this.createdAt = createdAt;
         this.role = role;
-        this.permissionNames = null;
-    }
-
-    public UserDto(String id, String username, String email, String role) {
-        this.id = Integer.parseInt(id);
-        this.username = username;
-        this.email = email;
-        this.role = role;
+        this.permissionNames = permissionNames;
     }
 
     // Getters and setters
@@ -151,11 +149,11 @@ public class UserDto {
         this.department = department;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public String getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(String createdAt) {
         this.createdAt = createdAt;
     }
 

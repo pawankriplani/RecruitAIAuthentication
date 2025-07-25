@@ -136,25 +136,14 @@ private void checkAccountStatus(User user) {
     }
 
 private UserDto createUserDto(User user) {
-        System.out.println("Debug - Creating UserDto for user: " + user.getUsername());
-        System.out.println("Debug - User roles before mapping: " + user.getUserRoles());
-        
         String role = user.getUserRoles().stream()
-            .map(userRole -> {
-                String roleName = userRole.getRole().getRoleName();
-                System.out.println("Debug - Mapping role: " + roleName);
-                return roleName;
-            })
+            .map(userRole -> userRole.getRole().getRoleName())
             .findFirst().orElse("User");
-        
-        System.out.println("Debug - Final selected role: " + role);
         
         List<String> permissionNames = user.getPermissions().stream()
             .map(permission -> permission.getPermissionName())
             .distinct()
             .collect(Collectors.toList());
-        
-        System.out.println("Debug - Collected permission names: " + permissionNames);
             
         UserDto userDto = new UserDto(
             user.getUserId(),
@@ -162,16 +151,19 @@ private UserDto createUserDto(User user) {
             user.getEmail(),
             user.getFullName(),
             user.getEmployeeId(),
-            user.getDepartment(),
+            user.getPhoneNumber(),
             user.getDesignation(),
             user.getRegion(),
-            user.getCreatedAt(),
-            role
+            user.getCostCenter(),
+            user.getBusinessUnit(),
+            user.getReportingManagerEmail(),
+            user.getDepartment(),
+            user.getProfilePicture(),
+            user.getCreatedAt().toString(), // Convert to string
+            role,
+            permissionNames
         );
         
-        userDto.setPermissionNames(permissionNames);
-        
-        System.out.println("Debug - Created UserDto: " + userDto);
         return userDto;
     }
 
