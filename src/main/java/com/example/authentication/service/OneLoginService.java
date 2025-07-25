@@ -120,6 +120,7 @@ public class OneLoginService {
                 LoginResponse loginResponse = new LoginResponse(
                     (String) tokenData.get("access_token"),
                     (String) tokenData.get("refresh_token"),
+                    idToken,
                     userDto
                 );
                 
