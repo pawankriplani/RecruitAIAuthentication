@@ -55,7 +55,7 @@ public class SecurityConfig {
                 .requestMatchers("/api/auth/register").permitAll()
                 .requestMatchers("/api/auth/exchange").permitAll()
                 .requestMatchers("/actuator/**").permitAll()
-                .anyRequest().authenticated())
+                .anyRequest().permitAll())
             .addFilterBefore(jwtRequestFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
