@@ -35,6 +35,17 @@ public class UserService {
     @Autowired
     private PermissionRepository permissionRepository;
 
+    @Transactional(readOnly = true)
+    public List<UserDto> getAllUsers() {
+        logger.debug("Fetching all users");
+        List<User> users = userRepository.findAll();
+        logger.debug("Found {} users", users.size());
+        
+        return users.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+
     @Autowired
     public UserService(UserRepository userRepository,
                        UserCreationService userCreationService,
@@ -102,9 +113,16 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(Integer userId) {
         logger.debug("Fetching user by ID: {}", userId);
         return userRepository.findById(userId)
+            .map(user -> {
+                // Initialize the collections
+                user.getUserRoles().size();
+                user.getPermissions().size();
+                return user;
+            })
             .orElseThrow(() -> {
                 logger.error("User not found with ID: {}", userId);
                 return new ResourceNotFoundException("User not found with id: " + userId);
