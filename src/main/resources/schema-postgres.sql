@@ -133,6 +133,18 @@ CREATE TABLE USER_PERMISSIONS (
     FOREIGN KEY (updated_by) REFERENCES USERS(user_id)
 );
 
+DROP TABLE IF EXISTS HR;
+
+CREATE TABLE HR (
+    hr_id SERIAL PRIMARY KEY,
+    name VARCHAR(100) NOT NULL,
+    email VARCHAR(100) NOT NULL UNIQUE,
+    created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
+);
+
+INSERT INTO HR (name, email) VALUES ('Shubham Singh', 'shubham16cse06@gmail.com');
+
 INSERT INTO PERMISSIONS (permission_name, description, created_by, updated_by)
 VALUES
 ('rmg_dashboard', 'Access to RMG Dashboard', 1, 1),
