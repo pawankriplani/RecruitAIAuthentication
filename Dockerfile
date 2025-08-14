@@ -10,8 +10,8 @@ FROM openjdk:17-jdk-slim
 WORKDIR /app
 COPY --from=build /app/target/*.jar app.jar
 
-# Set environment variables
-ENV PORT=1998
+# Expose ports
+EXPOSE 1998 8080
 
 # Run the jar file
 ENTRYPOINT ["java","-jar","/app/app.jar"]

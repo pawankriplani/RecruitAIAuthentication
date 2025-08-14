@@ -4,7 +4,7 @@
 set -e
 
 # Define variables
-PROJECT_ID="telusrecruitai"
+PROJECT_ID="telusrecruitai-468907"
 IMAGE_NAME="recruitai-authentication"
 REGION="asia-south1"  # Change this to your preferred region
 SERVICE_NAME="recruitai-authentication"
