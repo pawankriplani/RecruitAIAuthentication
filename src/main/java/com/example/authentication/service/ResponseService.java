@@ -1,10 +1,9 @@
 package com.example.authentication.service;
 
 import com.example.authentication.response.ApiResponse;
+import com.example.authentication.response.Error;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class ResponseService {
@@ -13,15 +12,7 @@ public class ResponseService {
         return ApiResponse.success(data);
     }
     
-    public <T> ApiResponse<T> successResponse(T data, String message) {
-        return ApiResponse.success(data, message);
-    }
-    
     public <T> ApiResponse<T> errorResponse(String message, HttpStatus status) {
-        return ApiResponse.error(message, status.value());
-    }
-    
-    public <T> ApiResponse<T> errorResponse(String message, HttpStatus status, List<String> errors) {
-        return ApiResponse.error(message, status.value(), errors);
+        return ApiResponse.error(status.value(), message);
     }
 }

@@ -5,7 +5,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.security.Keys;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.security.core.userdetails.UserDetails;
+import com.example.authentication.model.User;
 import org.springframework.stereotype.Component;
 
 import java.security.Key;
@@ -31,14 +31,14 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(keyBytes);
     }
 
-    public String generateToken(UserDetails userDetails) {
+    public String generateToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createToken(claims, userDetails.getUsername());
+        return createToken(claims, user.getEmail());
     }
 
-    public String generateRefreshToken(UserDetails userDetails) {
+    public String generateRefreshToken(User user) {
         Map<String, Object> claims = new HashMap<>();
-        return createRefreshToken(claims, userDetails.getUsername());
+        return createRefreshToken(claims, user.getEmail());
     }
 
     private String createToken(Map<String, Object> claims, String subject) {
@@ -61,12 +61,12 @@ public class JwtUtil {
                 .compact();
     }
 
-    public Boolean validateToken(String token, UserDetails userDetails) {
-        final String username = extractUsername(token);
-        return (username.equals(userDetails.getUsername()) && !isTokenExpired(token));
+    public Boolean validateToken(String token, User user) {
+        final String email = extractEmail(token);
+        return (email.equals(user.getEmail()) && !isTokenExpired(token));
     }
 
-    public String extractUsername(String token) {
+    public String extractEmail(String token) {
         return extractClaim(token, Claims::getSubject);
     }
 

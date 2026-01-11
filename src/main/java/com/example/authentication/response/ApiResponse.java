@@ -1,7 +1,5 @@
 package com.example.authentication.response;
 
-import java.util.List;
-
 /**
  * Generic API response wrapper for standardizing API responses across the application.
  * @param <T> The type of data contained in the response
@@ -9,16 +7,14 @@ import java.util.List;
 public class ApiResponse<T> {
     private boolean success;
     private T data;
-    private String message;
     private int statusCode;
-    private List<String> errors;
+    private Error errors;
     private long timestamp;
 
     // Private constructor to enforce the use of static factory methods
-    private ApiResponse(boolean success, T data, String message, int statusCode, List<String> errors, long timestamp) {
+    private ApiResponse(boolean success, T data, int statusCode, Error errors, long timestamp) {
         this.success = success;
         this.data = data;
-        this.message = message;
         this.statusCode = statusCode;
         this.errors = errors;
         this.timestamp = timestamp;
@@ -26,19 +22,11 @@ public class ApiResponse<T> {
 
     // Static factory methods for common responses
     public static <T> ApiResponse<T> success(T data) {
-        return new ApiResponse<>(true, data, "Success", 200, null, System.currentTimeMillis());
+        return new ApiResponse<>(true, data, 200, null, System.currentTimeMillis());
     }
 
-    public static <T> ApiResponse<T> success(T data, String message) {
-        return new ApiResponse<>(true, data, message, 200, null, System.currentTimeMillis());
-    }
-
-    public static <T> ApiResponse<T> error(String message, int statusCode) {
-        return new ApiResponse<>(false, null, message, statusCode, null, System.currentTimeMillis());
-    }
-
-    public static <T> ApiResponse<T> error(String message, int statusCode, List<String> errors) {
-        return new ApiResponse<>(false, null, message, statusCode, errors, System.currentTimeMillis());
+    public static <T> ApiResponse<T> error(int statusCode, String errorMessage) {
+        return new ApiResponse<>(false, null, statusCode, new Error(errorMessage), System.currentTimeMillis());
     }
 
     // Getters and setters
@@ -58,14 +46,6 @@ public class ApiResponse<T> {
         this.data = data;
     }
 
-    public String getMessage() {
-        return message;
-    }
-
-    public void setMessage(String message) {
-        this.message = message;
-    }
-
     public int getStatusCode() {
         return statusCode;
     }
@@ -74,11 +54,11 @@ public class ApiResponse<T> {
         this.statusCode = statusCode;
     }
 
-    public List<String> getErrors() {
+    public Error getErrors() {
         return errors;
     }
 
-    public void setErrors(List<String> errors) {
+    public void setErrors(Error errors) {
         this.errors = errors;
     }
 
