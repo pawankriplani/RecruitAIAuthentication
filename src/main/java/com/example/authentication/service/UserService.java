@@ -3,8 +3,10 @@ package com.example.authentication.service;
 import com.example.authentication.dto.RegistrationRequest;
 import com.example.authentication.dto.RegistrationResponse;
 import com.example.authentication.dto.UserDto;
+import com.example.authentication.event.NotificationEvent;
 import com.example.authentication.event.UserRegistrationData;
 import com.example.authentication.exception.EmailAlreadyInUseException;
+import com.example.authentication.exception.EmployeeIdAlreadyExistsException;
 import com.example.authentication.exception.ResourceNotFoundException;
 import com.example.authentication.exception.UsernameAlreadyTakenException;
 import com.example.authentication.model.*;
@@ -17,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.HashSet;
 import java.util.stream.Collectors;
 
 @Service
@@ -27,19 +30,69 @@ public class UserService {
     private final UserCreationService userCreationService;
     private final RoleManagementService roleManagementService;
     private final ApprovalRequestService approvalRequestService;
-    private final PubSubService pubSubService;
+    private final NotificationService notificationService;
+    
+    @Autowired
+    private PermissionRepository permissionRepository;
+
+    @Transactional(readOnly = true)
+    public List<UserDto> getAllUsers() {
+        logger.debug("Fetching all users");
+        List<User> users = userRepository.findAll();
+        logger.debug("Found {} users", users.size());
+        
+        return users.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
 
     @Autowired
     public UserService(UserRepository userRepository,
                        UserCreationService userCreationService,
                        RoleManagementService roleManagementService,
                        ApprovalRequestService approvalRequestService,
-                       PubSubService pubSubService) {
+                       NotificationService notificationService) {
         this.userRepository = userRepository;
         this.userCreationService = userCreationService;
         this.roleManagementService = roleManagementService;
         this.approvalRequestService = approvalRequestService;
-        this.pubSubService = pubSubService;
+        this.notificationService = notificationService;
+    }
+
+    @Transactional(readOnly = true)
+    public UserDto convertToDto(User user) {
+        logger.debug("Converting user to DTO: id={}, username={}, email={}", 
+            user.getUserId(), user.getUsername(), user.getEmail());
+        
+        String role = user.getUserRoles().stream()
+            .map(userRole -> userRole.getRole().getRoleName())
+            .findFirst().orElse("User");
+        
+        List<String> permissionNames = user.getPermissions().stream()
+            .map(Permission::getPermissionName)
+            .distinct()
+            .collect(Collectors.toList());
+            
+        UserDto userDto = new UserDto(
+            user.getUserId(),
+            user.getUsername(),
+            user.getEmail(),
+            user.getFullName(),
+            user.getEmployeeId(),
+            user.getPhoneNumber(),
+            user.getDesignation(),
+            user.getRegion(),
+            user.getCostCenter(),
+            user.getBusinessUnit(),
+            user.getReportingManagerEmail(),
+            user.getDepartment(),
+            user.getProfilePicture(),
+            user.getCreatedAt().toString(), // Convert to string
+            role,
+            permissionNames
+        );
+        
+        return userDto;
     }
 
     @Transactional
@@ -50,24 +103,7 @@ public class UserService {
         
         try {
             List<UserDto> userDtos = pendingUsers.stream()
-                    .map(user -> {
-                        logger.debug("Mapping user: id={}, username={}, email={}", 
-                            user.getUserId(), user.getUsername(), user.getEmail());
-                        String role = user.getUserRoles().stream()
-                            .map(userRole -> userRole.getRole().getRoleName())
-                            .findFirst()
-                            .orElse("User");
-                        return new UserDto(
-                            user.getUserId(),
-                            user.getUsername(),
-                            user.getEmail(),
-                            user.getFirstName(),
-                            user.getLastName(),
-                            user.getDepartment(),
-                            user.getCreatedAt(),
-                            role
-                        );
-                    })
+                    .map(this::convertToDto)
                     .collect(Collectors.toList());
             logger.debug("Successfully mapped {} users to DTOs", userDtos.size());
             return userDtos;
@@ -77,15 +113,23 @@ public class UserService {
         }
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(Integer userId) {
         logger.debug("Fetching user by ID: {}", userId);
         return userRepository.findById(userId)
+            .map(user -> {
+                // Initialize the collections
+                user.getUserRoles().size();
+                user.getPermissions().size();
+                return user;
+            })
             .orElseThrow(() -> {
                 logger.error("User not found with ID: {}", userId);
                 return new ResourceNotFoundException("User not found with id: " + userId);
             });
     }
-
+    
+    @Transactional
     public RegistrationResponse registerUser(RegistrationRequest request) {
         if (userRepository.existsByUsername(request.getUsername())) {
             throw new UsernameAlreadyTakenException(Constants.ERROR_USERNAME_TAKEN);
@@ -95,8 +139,15 @@ public class UserService {
             throw new EmailAlreadyInUseException(Constants.ERROR_EMAIL_IN_USE);
         }
 
+        if (userRepository.existsByEmployeeId(request.getEmployeeId())) {
+            throw new EmployeeIdAlreadyExistsException("Employee ID already exists");
+        }
+
         User user = userCreationService.createUser(request);
         Role role = roleManagementService.findRole(request.getRoleName());
+        
+        List<Permission> permissions = permissionRepository.findByPermissionNameIn(request.getPermissionNames());
+        user.setPermissions(new HashSet<>(permissions));
 
         User savedUser = userCreationService.saveUser(user);
         roleManagementService.assignRole(savedUser, role);
@@ -105,9 +156,13 @@ public class UserService {
 
         if (requiresApproval) {
             approvalRequestService.createApprovalRequest(savedUser);
-            approvalRequestService.notifyApprovalRequest(savedUser, role);
+  //          approvalRequestService.notifyApprovalRequest(savedUser, role);
         }
 
+        // Log the registration of the new user
+        logger.info("New user registered: id={}, username={}, email={}, fullName={}, employeeId={}, role={}",
+            savedUser.getUserId(), savedUser.getUsername(), savedUser.getEmail(), 
+            savedUser.getFullName(), savedUser.getEmployeeId(), role.getRoleName());
         // Get RMG email
         String rmgEmail = userRepository.findRmgEmail()
             .orElseThrow(() -> new IllegalStateException("No active RMG user found in the system"));
@@ -117,11 +172,18 @@ public class UserService {
             savedUser.getUserId().toString(),
             savedUser.getUsername(),
             savedUser.getEmail(),
+            savedUser.getFullName(),
+            savedUser.getEmployeeId(),
+            savedUser.getDesignation(),
             role.getRoleName(),
             savedUser.getAccountStatus().toString(),
             rmgEmail
         );
-        pubSubService.publishUserRegistrationEvent(registrationData);
+
+        // Send the notification asynchronously
+        notificationService.sendUserRegistrationNotification(registrationData);
+
+        logger.info("Initiated sending of user registration notification for user: {}", savedUser.getUsername());
 
         return new RegistrationResponse(Constants.SUCCESS_USER_REGISTERED, savedUser.getUserId(), requiresApproval);
     }

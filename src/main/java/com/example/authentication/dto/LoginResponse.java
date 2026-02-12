@@ -3,6 +3,7 @@ package com.example.authentication.dto;
 public class LoginResponse {
     private String token;
     private String refreshToken;
+    private String idToken;
     private UserDto user;
 
     public LoginResponse() {
@@ -14,7 +15,15 @@ public class LoginResponse {
         this.user = user;
     }
 
-    // Getters and setters
+    public LoginResponse(String token, String refreshToken, String idToken, UserDto user) {
+		super();
+		this.token = token;
+		this.refreshToken = refreshToken;
+		this.idToken = idToken;
+		this.user = user;
+	}
+
+	// Getters and setters
     public String getToken() {
         return token;
     }
@@ -38,4 +47,12 @@ public class LoginResponse {
     public void setUser(UserDto user) {
         this.user = user;
     }
+
+	public String getIdToken() {
+		return idToken;
+	}
+
+	public void setIdToken(String idToken) {
+		this.idToken = idToken;
+	}
 }
