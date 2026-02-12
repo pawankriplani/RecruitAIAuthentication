@@ -1,10 +1,10 @@
 package com.example.authentication.dto;
 
+import com.example.authentication.model.User.AccountStatus;
 import java.time.LocalDateTime;
-import java.util.List;
 
-public class UserDto {
-    private Integer id;
+public class ManagerDTO {
+    private Integer userId;
     private String username;
     private String email;
     private String fullName;
@@ -17,42 +17,15 @@ public class UserDto {
     private String reportingManagerEmail;
     private String department;
     private String profilePicture;
-    private LocalDateTime createdAt;
-    private String role;
-    private List<String> permissionNames;
+    private AccountStatus accountStatus;
 
-    public UserDto() {
+    // Getters and Setters
+    public Integer getUserId() {
+        return userId;
     }
 
-    public UserDto(Integer id, String username, String email, String fullName, String employeeId, String department, 
-                  String designation, String region, LocalDateTime createdAt, String role) {
-        this.id = id;
-        this.username = username;
-        this.email = email;
-        this.fullName = fullName;
-        this.employeeId = employeeId;
-        this.department = department;
-        this.designation = designation;
-        this.region = region;
-        this.createdAt = createdAt;
-        this.role = role;
-        this.permissionNames = null;
-    }
-
-    public UserDto(String id, String username, String email, String role) {
-        this.id = Integer.parseInt(id);
-        this.username = username;
-        this.email = email;
-        this.role = role;
-    }
-
-    // Getters and setters
-    public Integer getId() {
-        return id;
-    }
-
-    public void setId(Integer id) {
-        this.id = id;
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 
     public String getUsername() {
@@ -135,14 +108,6 @@ public class UserDto {
         this.reportingManagerEmail = reportingManagerEmail;
     }
 
-    public String getProfilePicture() {
-        return profilePicture;
-    }
-
-    public void setProfilePicture(String profilePicture) {
-        this.profilePicture = profilePicture;
-    }
-
     public String getDepartment() {
         return department;
     }
@@ -151,27 +116,20 @@ public class UserDto {
         this.department = department;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getProfilePicture() {
+        return profilePicture;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
     }
 
-    public String getRole() {
-        return role;
+
+    public AccountStatus getAccountStatus() {
+        return accountStatus;
     }
 
-    public void setRole(String role) {
-        this.role = role;
-    }
-
-    public List<String> getPermissionNames() {
-        return permissionNames;
-    }
-
-    public void setPermissionNames(List<String> permissionNames) {
-        this.permissionNames = permissionNames;
+    public void setAccountStatus(AccountStatus accountStatus) {
+        this.accountStatus = accountStatus;
     }
 }

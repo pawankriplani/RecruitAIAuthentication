@@ -2,15 +2,15 @@ package com.example.authentication.event;
 
 import com.example.authentication.util.Constants;
 
-public class PubSubEvent<T> {
+public class NotificationEvent<T> {
     private String eventType;
     private String timestamp;
     private T data;
 
-    public PubSubEvent() {
+    public NotificationEvent() {
     }
 
-    public PubSubEvent(String eventType, String timestamp, T data) {
+    public NotificationEvent(String eventType, String timestamp, T data) {
         this.eventType = eventType;
         this.timestamp = timestamp;
         this.data = data;

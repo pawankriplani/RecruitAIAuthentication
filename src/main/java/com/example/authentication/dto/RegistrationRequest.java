@@ -3,6 +3,7 @@ package com.example.authentication.dto;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import java.util.List;
 
 public class RegistrationRequest {
     
@@ -21,11 +22,32 @@ public class RegistrationRequest {
     @NotBlank(message = "Role is required")
     private String roleName;
 
-    @NotBlank(message = "First name is required")
-    private String firstName;
+    @NotBlank(message = "Full name is required")
+    private String fullName;
 
-    @NotBlank(message = "Last name is required")
-    private String lastName;
+    @NotBlank(message = "Employee ID is required")
+    @Size(min = 3, max = 50, message = "Employee ID must be between 3 and 50 characters")
+    private String employeeId;
+
+    @Size(max = 20, message = "Phone number must not exceed 20 characters")
+    private String phoneNumber;
+
+    private String designation;
+
+    private String region;
+
+    private String costCenter;
+
+    private String businessUnit;
+
+    @Email(message = "Invalid reporting manager email format")
+    private String reportingManagerEmail;
+
+    private String department;
+
+    private String profilePicture;
+
+    private List<String> permissionNames;
 
     // Getters and Setters
     public String getUsername() {
@@ -60,19 +82,91 @@ public class RegistrationRequest {
         this.roleName = roleName;
     }
 
-    public String getFirstName() {
-        return firstName;
+    public String getFullName() {
+        return fullName;
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 
-    public String getLastName() {
-        return lastName;
+    public String getEmployeeId() {
+        return employeeId;
     }
 
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setEmployeeId(String employeeId) {
+        this.employeeId = employeeId;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
+    }
+
+    public String getDesignation() {
+        return designation;
+    }
+
+    public void setDesignation(String designation) {
+        this.designation = designation;
+    }
+
+    public String getRegion() {
+        return region;
+    }
+
+    public void setRegion(String region) {
+        this.region = region;
+    }
+
+    public String getCostCenter() {
+        return costCenter;
+    }
+
+    public void setCostCenter(String costCenter) {
+        this.costCenter = costCenter;
+    }
+
+    public String getBusinessUnit() {
+        return businessUnit;
+    }
+
+    public void setBusinessUnit(String businessUnit) {
+        this.businessUnit = businessUnit;
+    }
+
+    public String getReportingManagerEmail() {
+        return reportingManagerEmail;
+    }
+
+    public void setReportingManagerEmail(String reportingManagerEmail) {
+        this.reportingManagerEmail = reportingManagerEmail;
+    }
+
+    public String getDepartment() {
+        return department;
+    }
+
+    public void setDepartment(String department) {
+        this.department = department;
+    }
+
+    public String getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(String profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
+    public List<String> getPermissionNames() {
+        return permissionNames;
+    }
+
+    public void setPermissionNames(List<String> permissionNames) {
+        this.permissionNames = permissionNames;
     }
 }

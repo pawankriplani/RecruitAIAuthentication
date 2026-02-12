@@ -14,6 +14,7 @@ public interface UserRepository extends JpaRepository<User, Integer> {
     Optional<User> findByEmail(String email);
     boolean existsByUsername(String username);
     boolean existsByEmail(String email);
+    boolean existsByEmployeeId(String employeeId);
     
     @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role WHERE u.email = :email")
     Optional<User> findByEmailWithRoles(@Param("email") String email);
@@ -23,4 +24,16 @@ public interface UserRepository extends JpaRepository<User, Integer> {
 
     @Query("SELECT u FROM User u WHERE u.accountStatus = 'PENDING'")
     List<User> findPendingUsers();
+
+    @Query("SELECT DISTINCT u FROM User u LEFT JOIN FETCH u.userRoles ur LEFT JOIN FETCH ur.role r WHERE r.roleName = 'Manager'")
+    List<User> findAllManagers();
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'Manager'")
+    long countTotalManagers();
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'Manager' AND u.isActive = true AND u.accountStatus = 'ACTIVE'")
+    long countActiveManagers();
+
+    @Query("SELECT COUNT(u) FROM User u JOIN u.userRoles ur JOIN ur.role r WHERE r.roleName = 'Manager' AND u.accountStatus = 'PENDING'")
+    long countPendingManagers();
 }

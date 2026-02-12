@@ -1,9 +1,6 @@
 package com.example.authentication.controller;
 
-import com.example.authentication.dto.LoginRequest;
-import com.example.authentication.dto.LoginResponse;
-import com.example.authentication.dto.RegistrationRequest;
-import com.example.authentication.dto.RegistrationResponse;
+import com.example.authentication.dto.*;
 import com.example.authentication.response.ApiResponse;
 import com.example.authentication.service.AuthenticationService;
 import com.example.authentication.service.ResponseService;
@@ -31,18 +28,25 @@ public class AuthController {
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<RegistrationResponse>> registerUser(@Valid @RequestBody RegistrationRequest request) {
         RegistrationResponse response = userService.registerUser(request);
-        return ResponseEntity.ok(responseService.successResponse(response, "User registered successfully"));
+        return ResponseEntity.ok(responseService.successResponse(response));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<LoginResponse>> login(@Valid @RequestBody LoginRequest loginRequest) {
         LoginResponse loginResponse = authenticationService.login(loginRequest);
-        return ResponseEntity.ok(responseService.successResponse(loginResponse, "Login successful"));
+        return ResponseEntity.ok(responseService.successResponse(loginResponse));
     }
 
     @PostMapping("/refresh")
     public ResponseEntity<ApiResponse<LoginResponse>> refreshToken(@RequestBody String refreshToken) {
         LoginResponse loginResponse = authenticationService.refreshToken(refreshToken);
-        return ResponseEntity.ok(responseService.successResponse(loginResponse, "Token refreshed successfully"));
+        return ResponseEntity.ok(responseService.successResponse(loginResponse));
+    }
+
+    @PostMapping("/update-account-status")
+    public ResponseEntity<ApiResponse<String>> unlockAccount(@Valid @RequestBody UnlockAccountRequest unlockAccountRequest) {
+        authenticationService.unlockAccount(unlockAccountRequest);
+        String message = String.format("Account status updated to %s successfully", unlockAccountRequest.getStatus());
+        return ResponseEntity.ok(responseService.successResponse(message));
     }
 }
